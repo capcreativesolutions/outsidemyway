@@ -66,63 +66,63 @@
     crossorigin=""
   ></script>
   <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const map = L.map('map').setView([31.9686, -99.9018], 6);
+    document.addEventListener("DOMContentLoaded", function () {
+      const map = L.map('map').setView([31.9686, -99.9018], 6);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
 
-    const markerLayer = L.layerGroup().addTo(map);
-    let allLocations = [];
+      const markerLayer = L.layerGroup().addTo(map);
+      let allLocations = [];
 
-    function renderMarkers(data) {
-      markerLayer.clearLayers();
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-      const selectedCategories = Array.from(document.getElementById('categoryFilter').selectedOptions).map(o => o.value);
+      function renderMarkers(data) {
+        markerLayer.clearLayers();
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const selectedCategories = Array.from(document.getElementById('categoryFilter').selectedOptions).map(o => o.value);
 
-      data.forEach(item => {
-        const matchesSearch = item.name.toLowerCase().includes(searchTerm) || item.description.toLowerCase().includes(searchTerm);
-        const matchesCategory = selectedCategories.length === 0 || selectedCategories.some(cat => item.category.includes(cat));
+        data.forEach(item => {
+          const matchesSearch = item.name.toLowerCase().includes(searchTerm) || item.description.toLowerCase().includes(searchTerm);
+          const matchesCategory = selectedCategories.length === 0 || selectedCategories.some(cat => item.category.includes(cat));
 
-        if (matchesSearch && matchesCategory) {
-          const marker = L.marker([item.latitude, item.longitude]).bindPopup(`<strong>${item.name}</strong><br>${item.description}`);
-          markerLayer.addLayer(marker);
+          if (matchesSearch && matchesCategory) {
+            const marker = L.marker([item.latitude, item.longitude]).bindPopup(`<strong>${item.name}</strong><br>${item.description}`);
+            markerLayer.addLayer(marker);
+          }
+        });
+      }
+
+      function populateFilters(data) {
+        const uniqueCategories = new Set();
+        data.forEach(item => {
+          item.category.split(',').forEach(cat => uniqueCategories.add(cat.trim()));
+        });
+        const categoryFilter = document.getElementById('categoryFilter');
+        categoryFilter.innerHTML = '';
+        Array.from(uniqueCategories).sort().forEach(cat => {
+          const opt = document.createElement('option');
+          opt.value = cat;
+          opt.textContent = cat;
+          categoryFilter.appendChild(opt);
+        });
+      }
+
+      document.getElementById('searchInput').addEventListener('input', () => renderMarkers(allLocations));
+      document.getElementById('categoryFilter').addEventListener('change', () => renderMarkers(allLocations));
+
+      // Load CSV
+      Papa.parse("https://raw.githubusercontent.com/capcreativesolutions/outsidemyway/main/cleaned-locations.csv", {
+        header: true,
+        download: true,
+        complete: function(results) {
+          allLocations = results.data.filter(row => row.latitude && row.longitude);
+          populateFilters(allLocations);
+          renderMarkers(allLocations);
         }
       });
-    }
-
-    function populateFilters(data) {
-      const uniqueCategories = new Set();
-      data.forEach(item => {
-        item.category.split(',').forEach(cat => uniqueCategories.add(cat.trim()));
-      });
-      const categoryFilter = document.getElementById('categoryFilter');
-      categoryFilter.innerHTML = '';
-      Array.from(uniqueCategories).sort().forEach(cat => {
-        const opt = document.createElement('option');
-        opt.value = cat;
-        opt.textContent = cat;
-        categoryFilter.appendChild(opt);
-      });
-    }
-
-    document.getElementById('searchInput').addEventListener('input', () => renderMarkers(allLocations));
-    document.getElementById('categoryFilter').addEventListener('change', () => renderMarkers(allLocations));
-
-    // Load CSV
-    Papa.parse("https://raw.githubusercontent.com/capcreativesolutions/outsidemyway/main/cleaned-locations.csv", {
-      header: true,
-      download: true,
-      complete: function(results) {
-        allLocations = results.data.filter(row => row.latitude && row.longitude);
-        populateFilters(allLocations);
-        renderMarkers(allLocations);
-      }
     });
-  });
-</script>
+  </script>
 </body>
 </html>
 
