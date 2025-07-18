@@ -66,6 +66,7 @@
     crossorigin=""
   ></script>
   <script>
+  document.addEventListener("DOMContentLoaded", function () {
     const map = L.map('map').setView([31.9686, -99.9018], 6);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -120,7 +121,8 @@
         renderMarkers(allLocations);
       }
     });
-  </script>
+  });
+</script>
 </body>
 </html>
 
