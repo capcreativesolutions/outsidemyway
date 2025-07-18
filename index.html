@@ -2,32 +2,74 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Outside My Way - Map</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Outside My Way</title>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/684/684908.png" type="image/png" />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <!-- Custom Styles -->
   <style>
-    body, html { margin: 0; padding: 0; height: 100%; }
-    #map { height: 100vh; width: 100vw; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
+      color: #333;
+    }
+
+    header {
+      background: #2a4b3d;
+      color: white;
+      padding: 1rem 2rem;
+      text-align: center;
+      font-size: 1.8rem;
+      letter-spacing: 1px;
+    }
+
+    #map {
+      height: 90vh;
+      width: 100%;
+    }
+
+    footer {
+      text-align: center;
+      padding: 0.75rem;
+      background: #eee;
+      font-size: 0.9rem;
+    }
+
+    a {
+      color: #2a4b3d;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
-  <div id="map"></div>
-  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-  <script>
-    const locations = [
-      { name: "Cherokee National Forest", lat: 36.45515, lng: -82.09069, category: "Free Camping" },
-      { name: "Coconino National Forest", lat: 34.85794, lng: -111.94703, category: "Hiking, Free Camping" }
-    ];
 
-    const map = L.map('map').setView([36.5, -98.0], 4);
+  <header>Outside My Way</header>
+
+  <div id="map"></div>
+
+  <footer>
+    © 2025 Outside My Way • <a href="mailto:info@outsidemyway.com">Contact Us</a>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- Initialize Map -->
+  <script>
+    const map = L.map('map').setView([29.0, -98.0], 6); // Centered on Texas
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
-
-    locations.forEach(loc => {
-      const marker = L.marker([loc.lat, loc.lng]).addTo(map);
-      marker.bindPopup(`<b>${loc.name}</b><br>${loc.category}`);
-    });
   </script>
+
 </body>
 </html>
