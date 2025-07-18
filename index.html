@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Outside My Way - Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <style>
+    body, html { margin: 0; padding: 0; height: 100%; }
+    #map { height: 100vh; width: 100vw; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <script>
+    const locations = [
+      { name: "Cherokee National Forest", lat: 36.45515, lng: -82.09069, category: "Free Camping" },
+      { name: "Coconino National Forest", lat: 34.85794, lng: -111.94703, category: "Hiking, Free Camping" }
+    ];
+
+    const map = L.map('map').setView([36.5, -98.0], 4);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    locations.forEach(loc => {
+      const marker = L.marker([loc.lat, loc.lng]).addTo(map);
+      marker.bindPopup(`<b>${loc.name}</b><br>${loc.category}`);
+    });
+  </script>
+</body>
+</html>
