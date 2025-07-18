@@ -2,74 +2,125 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Outside My Way</title>
-  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/684/684908.png" type="image/png" />
-
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
-  <!-- Custom Styles -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-sA+e2B65ljlNA/YOXW+ZoGfV+h+g1P6s3kQxv4oF3eY="
+    crossorigin=""
+  />
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #f4f4f4;
-      color: #333;
+      font-family: Arial, sans-serif;
     }
-
     header {
-      background: #2a4b3d;
-      color: white;
-      padding: 1rem 2rem;
-      text-align: center;
-      font-size: 1.8rem;
-      letter-spacing: 1px;
+      background-color: #f4f4f4;
+      padding: 1rem;
+      text-align: left;
+      font-size: 1.5rem;
+      font-weight: bold;
     }
-
+    .controls {
+      padding: 1rem;
+      background: #ffffff;
+      border-bottom: 1px solid #ccc;
+    }
+    .filter-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 300px;
+      margin-bottom: 1rem;
+    }
+    .filter-section label {
+      font-weight: bold;
+    }
     #map {
-      height: 90vh;
-      width: 100%;
-    }
-
-    footer {
-      text-align: center;
-      padding: 0.75rem;
-      background: #eee;
-      font-size: 0.9rem;
-    }
-
-    a {
-      color: #2a4b3d;
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
+      height: calc(100vh - 180px);
     }
   </style>
 </head>
 <body>
+  <header>
+    Outside My Way
+  </header>
 
-  <header>Outside My Way</header>
+  <div class="controls">
+    <div class="filter-section">
+      <label for="categoryFilter">Filter by Category:</label>
+      <select id="categoryFilter" multiple size="5"></select>
+
+      <label for="searchInput">Search by Name or Keyword:</label>
+      <input type="text" id="searchInput" placeholder="e.g. Barton Creek, waterfall" />
+    </div>
+  </div>
 
   <div id="map"></div>
 
-  <footer>
-    © 2025 Outside My Way • <a href="mailto:info@outsidemyway.com">Contact Us</a>
-  </footer>
-
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-  <!-- Initialize Map -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-o9N1jRVvJbC3qd4A/zD3Hj6k7L2Ltt3lMOty3ZEpgk="
+    crossorigin=""
+  ></script>
   <script>
-    const map = L.map('map').setView([29.0, -98.0], 6); // Centered on Texas
+    const map = L.map('map').setView([31.9686, -99.9018], 6);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
-  </script>
 
+    const markerLayer = L.layerGroup().addTo(map);
+    let allLocations = [];
+
+    function renderMarkers(data) {
+      markerLayer.clearLayers();
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const selectedCategories = Array.from(document.getElementById('categoryFilter').selectedOptions).map(o => o.value);
+
+      data.forEach(item => {
+        const matchesSearch = item.name.toLowerCase().includes(searchTerm) || item.description.toLowerCase().includes(searchTerm);
+        const matchesCategory = selectedCategories.length === 0 || selectedCategories.some(cat => item.category.includes(cat));
+
+        if (matchesSearch && matchesCategory) {
+          const marker = L.marker([item.latitude, item.longitude]).bindPopup(`<strong>${item.name}</strong><br>${item.description}`);
+          markerLayer.addLayer(marker);
+        }
+      });
+    }
+
+    function populateFilters(data) {
+      const uniqueCategories = new Set();
+      data.forEach(item => {
+        item.category.split(',').forEach(cat => uniqueCategories.add(cat.trim()));
+      });
+      const categoryFilter = document.getElementById('categoryFilter');
+      categoryFilter.innerHTML = '';
+      Array.from(uniqueCategories).sort().forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat;
+        categoryFilter.appendChild(opt);
+      });
+    }
+
+    document.getElementById('searchInput').addEventListener('input', () => renderMarkers(allLocations));
+    document.getElementById('categoryFilter').addEventListener('change', () => renderMarkers(allLocations));
+
+    // Load CSV
+    Papa.parse("https://raw.githubusercontent.com/capcreativesolutions/outsidemyway/main/cleaned-locations.csv", {
+      header: true,
+      download: true,
+      complete: function(results) {
+        allLocations = results.data.filter(row => row.latitude && row.longitude);
+        populateFilters(allLocations);
+        renderMarkers(allLocations);
+      }
+    });
+  </script>
 </body>
 </html>
+
