@@ -111,6 +111,24 @@
   <div id="results"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBQE3U0lPxLlCF7qcDxo1Pd2qabCXUUtFw",
+      authDomain: "outsidemyway.firebaseapp.com",
+      projectId: "outsidemyway",
+      storageBucket: "outsidemyway.firebasestorage.app",
+      messagingSenderId: "696283600984",
+      appId: "1:696283600984:web:6d1c28e728b2a93108d22d"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const map = L.map('map').setView([31.9686, -99.9018], 6);
