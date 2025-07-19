@@ -116,7 +116,13 @@
         header: true,
         download: true,
         complete: function(results) {
-          allLocations = results.data.filter(row => row.latitude && row.longitude);
+          allLocations = results.data
+  .filter(row => row.latitude && row.longitude)
+  .map(row => ({
+    ...row,
+    latitude: parseFloat(row.latitude),
+    longitude: parseFloat(row.longitude)
+  }));
           populateFilters(allLocations);
           renderMarkers(allLocations);
         }
