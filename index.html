@@ -53,7 +53,7 @@
     #controls {
       position: absolute;
       bottom: 20px;
-      left: 20px;
+      left: 270px;
       background: white;
       box-shadow: 0 0 5px rgba(0,0,0,0.3);
       border-radius: 8px;
@@ -102,9 +102,9 @@
       </div>
     </div>
     <div id="map"></div>
-  </div>
-  <div id="controls">
-    <input type="text" id="search" placeholder="Search name...">
+    <div id="controls">
+      <input type="text" id="search" placeholder="Search name...">
+    </div>
   </div>
   <div id="results"></div>
 
@@ -122,17 +122,17 @@
       const categoryIcons = {};
       const colorAssignments = {
         "Free Camping": "gold",
-        "Camping": "darkred",
-        "Swimming Hole": "deepskyblue",
-        "Hiking": "seagreen",
-        "Horseback Riding": "indigo",
-        "Fishing": "darkorange"
+        "Camping": "red",
+        "Swimming Hole": "blue",
+        "Hiking": "green",
+        "Horseback Riding": "purple",
+        "Fishing": "orange"
       };
 
       function getIcon(category) {
         const color = colorAssignments[category] || "gray";
         if (!categoryIcons[category]) {
-          categoryIcons[category] = L.icon({
+          categoryIcons[category] = new L.Icon({
             iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,
             shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png',
             iconSize: [25, 41],
