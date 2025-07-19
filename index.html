@@ -50,19 +50,20 @@
       display: block;
       margin-bottom: 5px;
     }
-    #controls {
-      position: absolute;
-      bottom: 20px;
-      left: 270px;
-      background: white;
-      box-shadow: 0 0 5px rgba(0,0,0,0.3);
-      border-radius: 8px;
-      padding: 10px;
-      z-index: 1000;
-    }
     #map {
       height: 70vh;
       flex-grow: 1;
+      position: relative;
+    }
+    #search-container {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
     }
     #results {
       padding: 10px;
@@ -101,9 +102,10 @@
         <select id="categoryFilter" multiple size="10"></select>
       </div>
     </div>
-    <div id="map"></div>
-    <div id="controls">
-      <input type="text" id="search" placeholder="Search name...">
+    <div id="map">
+      <div id="search-container">
+        <input type="text" id="search" placeholder="Search name...">
+      </div>
     </div>
   </div>
   <div id="results"></div>
