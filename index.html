@@ -64,21 +64,23 @@
             const name = fields[0];
             const lat = parseFloat(fields[1]);
             const lon = parseFloat(fields[2]);
-            const category = fields[3] || "Other";
+            const categoryField = fields[3] || "Other";
 
             if (!isNaN(lat) && !isNaN(lon)) {
               const marker = L.marker([lat, lon])
                 .addTo(map)
                 .bindPopup(`<strong>${name}</strong>`);
-              marker.category = category;
+
               marker.name = name;
+              marker.categories = categoryField.split(',').map(cat => cat.trim());
+
               markers.push(marker);
-              categories.add(category);
+              marker.categories.forEach(cat => categories.add(cat));
             }
           });
 
           const filter = document.getElementById('categoryFilter');
-          categories.forEach(cat => {
+          Array.from(categories).sort().forEach(cat => {
             const option = document.createElement('option');
             option.value = cat;
             option.textContent = cat;
@@ -90,7 +92,7 @@
             const selectedCategory = filter.value;
 
             markers.forEach(marker => {
-              const matchCategory = selectedCategory === "" || marker.category === selectedCategory;
+              const matchCategory = selectedCategory === "" || marker.categories.includes(selectedCategory);
               const matchName = marker.name.toLowerCase().includes(searchTerm);
               if (matchCategory && matchName) {
                 marker.addTo(map);
