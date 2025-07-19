@@ -57,14 +57,13 @@
         .then(response => response.text())
         .then(csvText => {
           const lines = csvText.trim().split('\n');
-          const headers = lines[0].split(',');
 
           lines.slice(1).forEach(line => {
-            const fields = line.split(',');
-            const name = fields[0];
+            const fields = line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
+            const name = fields[0]?.replace(/^"|"$/g, '') || "Unnamed";
             const lat = parseFloat(fields[1]);
             const lon = parseFloat(fields[2]);
-            const categoryField = fields[3] || "Other";
+            const categoryField = fields[3]?.replace(/^"|"$/g, '') || "Other";
 
             if (!isNaN(lat) && !isNaN(lon)) {
               const marker = L.marker([lat, lon])
