@@ -161,13 +161,13 @@
             const categoryField = row.category || "Other";
 
             if (!isNaN(lat) && !isNaN(lon)) {
-              const categoryList = categoryField.split(',').map(cat => cat.trim());
-              const primaryCategory = categoryList.includes("Free Camping") ? "Free Camping" : categoryList[0];
+              const categoryList = categoryField.split(',').map(cat => cat.trim().toLowerCase());
+              const primaryCategory = categoryList.includes("free camping") ? "Free Camping" : categoryList[0].replace(/^\w/, c => c.toUpperCase());
               const icon = getIcon(primaryCategory);
 
               const marker = L.marker([lat, lon], { icon });
               marker.name = name;
-              marker.categories = categoryList.map(cat => cat.toLowerCase());
+              marker.categories = categoryList;
               marker.description = row.description || "";
               marker.lat = lat;
               marker.lon = lon;
