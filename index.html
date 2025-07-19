@@ -8,6 +8,7 @@
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   />
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -56,14 +57,16 @@
       fetch('locations.csv')
         .then(response => response.text())
         .then(csvText => {
-          const lines = csvText.trim().split('\n');
+          const parsed = Papa.parse(csvText, {
+            header: true,
+            skipEmptyLines: true,
+          });
 
-          lines.slice(1).forEach(line => {
-            const fields = line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
-            const name = fields[0]?.replace(/^"|"$/g, '') || "Unnamed";
-            const lat = parseFloat(fields[1]);
-            const lon = parseFloat(fields[2]);
-            const categoryField = fields[3]?.replace(/^"|"$/g, '') || "Other";
+          parsed.data.forEach(row => {
+            const name = row.name || "Unnamed";
+            const lat = parseFloat(row.latitude);
+            const lon = parseFloat(row.longitude);
+            const categoryField = row.category || "Other";
 
             if (!isNaN(lat) && !isNaN(lon)) {
               const marker = L.marker([lat, lon])
