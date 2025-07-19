@@ -167,7 +167,7 @@
 
               const marker = L.marker([lat, lon], { icon });
               marker.name = name;
-              marker.categories = categoryList;
+              marker.categories = categoryList.map(cat => cat.toLowerCase());
               marker.description = row.description || "";
               marker.lat = lat;
               marker.lon = lon;
@@ -199,8 +199,8 @@
 
           function updateMarkers() {
             const searchTerm = document.getElementById('search').value.toLowerCase();
-            const selectedCategories = Array.from(document.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value);
-            const selectedDropdown = Array.from(filter.selectedOptions).map(opt => opt.value);
+            const selectedCategories = Array.from(document.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value.toLowerCase());
+            const selectedDropdown = Array.from(filter.selectedOptions).map(opt => opt.value.toLowerCase());
             const combinedCategories = [...selectedCategories, ...selectedDropdown];
             document.getElementById('results').innerHTML = "";
 
