@@ -13,6 +13,16 @@
       margin: 0;
       font-family: Arial, sans-serif;
     }
+    #controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    }
     #map {
       height: 100vh;
       width: 100vw;
@@ -20,6 +30,12 @@
   </style>
 </head>
 <body>
+  <div id="controls">
+    <input type="text" id="search" placeholder="Search name...">
+    <select id="categoryFilter">
+      <option value="">All Categories</option>
+    </select>
+  </div>
   <div id="map"></div>
 
   <script
@@ -34,6 +50,9 @@
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
 
+      const markers = [];
+      const categories = new Set();
+
       fetch('locations.csv')
         .then(response => response.text())
         .then(csvText => {
@@ -45,13 +64,44 @@
             const name = fields[0];
             const lat = parseFloat(fields[1]);
             const lon = parseFloat(fields[2]);
+            const category = fields[3] || "Other";
 
             if (!isNaN(lat) && !isNaN(lon)) {
-              L.marker([lat, lon])
+              const marker = L.marker([lat, lon])
                 .addTo(map)
                 .bindPopup(`<strong>${name}</strong>`);
+              marker.category = category;
+              marker.name = name;
+              markers.push(marker);
+              categories.add(category);
             }
           });
+
+          const filter = document.getElementById('categoryFilter');
+          categories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat;
+            option.textContent = cat;
+            filter.appendChild(option);
+          });
+
+          function updateMarkers() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const selectedCategory = filter.value;
+
+            markers.forEach(marker => {
+              const matchCategory = selectedCategory === "" || marker.category === selectedCategory;
+              const matchName = marker.name.toLowerCase().includes(searchTerm);
+              if (matchCategory && matchName) {
+                marker.addTo(map);
+              } else {
+                map.removeLayer(marker);
+              }
+            });
+          }
+
+          document.getElementById('search').addEventListener('input', updateMarkers);
+          filter.addEventListener('change', updateMarkers);
         })
         .catch(error => {
           console.error("Failed to load CSV:", error);
