@@ -4,15 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Outside My Way</title>
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
     }
     header {
       display: flex;
@@ -32,26 +31,36 @@
     #controls {
       display: flex;
       flex-direction: column;
+      align-items: flex-start;
+      padding: 10px;
+      background: white;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+      border-radius: 8px;
+      z-index: 1000;
       position: absolute;
       top: 70px;
       left: 10px;
-      z-index: 1000;
-      background: white;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.3);
       gap: 5px;
     }
     #map {
-      height: calc(100vh - 60px);
+      height: 70vh;
       width: 100vw;
     }
-    input, select {
+    #results {
+      padding: 10px;
+      background: #f9f9f9;
+      height: 30vh;
+      overflow-y: auto;
+    }
+    input[type="text"] {
       padding: 5px;
       font-size: 1em;
+      width: 200px;
     }
-    select option {
-      font-size: 0.95em;
+    select {
+      padding: 5px;
+      font-size: 1em;
+      width: 200px;
     }
   </style>
 </head>
@@ -62,31 +71,34 @@
   </header>
   <div id="controls">
     <input type="text" id="search" placeholder="Search name...">
-    <select id="categoryFilter">
-      <option value="">All Categories</option>
+    <select id="categoryFilter" multiple size="8">
     </select>
   </div>
   <div id="map"></div>
+  <div id="results"></div>
 
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  ></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const map = L.map('map').setView([31.9686, -99.9018], 6);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
 
       const markers = [];
       const categories = new Set();
       const categoryIcons = {};
+      const colors = ["green", "red", "blue", "orange", "purple", "yellow", "violet", "grey", "black"];
+      const colorMap = {};
 
       function getIcon(category) {
         if (!categoryIcons[category]) {
-          const color = category === 'Free Camping' ? 'green' : category === 'Hiking' ? 'orange' : category === 'Swimming' ? 'blue' : 'red';
+          if (!colorMap[category]) {
+            const keys = Object.keys(colorMap);
+            colorMap[category] = colors[keys.length % colors.length];
+          }
+          const color = colorMap[category];
           categoryIcons[category] = L.icon({
             iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,
             shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png',
@@ -118,7 +130,6 @@
               const icon = getIcon(categoryList[0]);
 
               const marker = L.marker([lat, lon], { icon })
-                .addTo(map)
                 .bindPopup(`<strong>${name}</strong>`);
 
               marker.name = name;
@@ -139,13 +150,18 @@
 
           function updateMarkers() {
             const searchTerm = document.getElementById('search').value.toLowerCase();
-            const selectedCategory = filter.value;
+            const selectedOptions = Array.from(filter.selectedOptions).map(opt => opt.value);
+
+            document.getElementById('results').innerHTML = "";
 
             markers.forEach(marker => {
-              const matchCategory = selectedCategory === "" || marker.categories.includes(selectedCategory);
+              const matchCategory = selectedOptions.length === 0 || marker.categories.some(cat => selectedOptions.includes(cat));
               const matchName = marker.name.toLowerCase().includes(searchTerm);
               if (matchCategory && matchName) {
                 marker.addTo(map);
+                const item = document.createElement('div');
+                item.innerHTML = `<strong>${marker.name}</strong><br><em>${marker.categories.join(', ')}</em><br><br>`;
+                document.getElementById('results').appendChild(item);
               } else {
                 map.removeLayer(marker);
               }
@@ -154,6 +170,7 @@
 
           document.getElementById('search').addEventListener('input', updateMarkers);
           filter.addEventListener('change', updateMarkers);
+          updateMarkers();
         })
         .catch(error => {
           console.error("Failed to load CSV:", error);
