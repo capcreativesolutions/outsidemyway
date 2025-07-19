@@ -99,7 +99,7 @@
       </div>
       <div class="filter-group">
         <h3>More Categories</h3>
-        <select id="categoryFilter" multiple size="10"></select>
+        <div class="checkbox-list" id="moreCategories"></div>
       </div>
     </div>
     <div id="map">
@@ -190,19 +190,18 @@
             }
           });
 
-          const filter = document.getElementById('categoryFilter');
+          const moreCategoriesDiv = document.getElementById('moreCategories');
           Array.from(categories).sort().forEach(cat => {
-            const option = document.createElement('option');
-            option.value = cat;
-            option.textContent = cat;
-            filter.appendChild(option);
+            const label = document.createElement('label');
+            label.innerHTML = `<input type="checkbox" class="more-category-checkbox" value="${cat}"> ${cat.charAt(0).toUpperCase() + cat.slice(1)}`;
+            moreCategoriesDiv.appendChild(label);
           });
 
           function updateMarkers() {
             const searchTerm = document.getElementById('search').value.toLowerCase();
             const selectedCategories = Array.from(document.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value.toLowerCase());
-            const selectedDropdown = Array.from(filter.selectedOptions).map(opt => opt.value.toLowerCase());
-            const combinedCategories = [...new Set([...selectedCategories, ...selectedDropdown])];
+            const selectedMoreCategories = Array.from(document.querySelectorAll('.more-category-checkbox:checked')).map(cb => cb.value.toLowerCase());
+            const combinedCategories = [...new Set([...selectedCategories, ...selectedMoreCategories])];
             document.getElementById('results').innerHTML = "";
 
             markers.forEach(marker => {
@@ -217,8 +216,12 @@
           }
 
           document.getElementById('search').addEventListener('input', updateMarkers);
-          filter.addEventListener('change', updateMarkers);
           document.querySelectorAll('.filter-checkbox').forEach(cb => cb.addEventListener('change', updateMarkers));
+          document.addEventListener('change', (e) => {
+            if (e.target.classList.contains('more-category-checkbox')) {
+              updateMarkers();
+            }
+          });
 
           updateMarkers();
         })
