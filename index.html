@@ -28,23 +28,41 @@
       font-size: 1.5em;
       margin: 0;
     }
-    #controls {
+    #main {
+      display: flex;
+      flex-direction: row;
+    }
+    #filters {
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
       padding: 10px;
+      width: 250px;
+      background: #f0f0f0;
+      border-right: 1px solid #ccc;
+    }
+    .filter-group {
+      margin-bottom: 20px;
+    }
+    .filter-group h3 {
+      margin-bottom: 10px;
+    }
+    .checkbox-list label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    #controls {
+      position: absolute;
+      top: 70px;
+      left: 270px;
       background: white;
       box-shadow: 0 0 5px rgba(0,0,0,0.3);
       border-radius: 8px;
+      padding: 10px;
       z-index: 1000;
-      position: absolute;
-      top: 70px;
-      left: 10px;
-      gap: 5px;
     }
     #map {
       height: 70vh;
-      width: 100vw;
+      flex-grow: 1;
     }
     #results {
       padding: 10px;
@@ -60,16 +78,6 @@
       margin-bottom: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    input[type="text"] {
-      padding: 5px;
-      font-size: 1em;
-      width: 200px;
-    }
-    select {
-      padding: 5px;
-      font-size: 1em;
-      width: 200px;
-    }
   </style>
 </head>
 <body>
@@ -77,11 +85,27 @@
     <img src="logo.png" alt="Outside My Way logo">
     <h1>Outside My Way</h1>
   </header>
+  <div id="main">
+    <div id="filters">
+      <div class="filter-group">
+        <h3>Popular Filters</h3>
+        <div class="checkbox-list">
+          <label><input type="checkbox" class="filter-checkbox" value="Free Camping"> Free Camping</label>
+          <label><input type="checkbox" class="filter-checkbox" value="Camping"> Camping</label>
+          <label><input type="checkbox" class="filter-checkbox" value="Hiking"> Hiking</label>
+          <label><input type="checkbox" class="filter-checkbox" value="Swimming Hole"> Swimming Hole</label>
+        </div>
+      </div>
+      <div class="filter-group">
+        <h3>More Categories</h3>
+        <select id="categoryFilter" multiple size="10"></select>
+      </div>
+    </div>
+    <div id="map"></div>
+  </div>
   <div id="controls">
     <input type="text" id="search" placeholder="Search name...">
-    <select id="categoryFilter" multiple size="8"></select>
   </div>
-  <div id="map"></div>
   <div id="results"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -103,10 +127,6 @@
         "Hiking": "green",
         "Horseback Riding": "purple",
         "Fishing": "orange"
-      };
-
-      const mergedCategories = {
-        "Camping": ["Camping", "Free Camping"],
       };
 
       function getIcon(category) {
@@ -147,6 +167,8 @@
               marker.name = name;
               marker.categories = categoryList;
               marker.description = row.description || "";
+              marker.lat = lat;
+              marker.lon = lon;
 
               marker.on('click', () => {
                 const resultDiv = document.getElementById('results');
@@ -155,6 +177,7 @@
                     <strong>${marker.name}</strong><br>
                     <em>${marker.categories.join(', ')}</em><br>
                     <p>${marker.description}</p>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${marker.lat},${marker.lon}" target="_blank">Navigate with Google Maps</a>
                   </div>
                 `;
               });
@@ -174,11 +197,13 @@
 
           function updateMarkers() {
             const searchTerm = document.getElementById('search').value.toLowerCase();
-            const selectedOptions = Array.from(filter.selectedOptions).map(opt => opt.value);
+            const selectedCategories = Array.from(document.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value);
+            const selectedDropdown = Array.from(filter.selectedOptions).map(opt => opt.value);
+            const combinedCategories = [...selectedCategories, ...selectedDropdown];
             document.getElementById('results').innerHTML = "";
 
             markers.forEach(marker => {
-              const matchCategory = selectedOptions.length === 0 || marker.categories.some(cat => selectedOptions.includes(cat));
+              const matchCategory = combinedCategories.length === 0 || marker.categories.some(cat => combinedCategories.includes(cat));
               const matchName = marker.name.toLowerCase().includes(searchTerm);
               if (matchCategory && matchName) {
                 marker.addTo(map);
@@ -190,6 +215,8 @@
 
           document.getElementById('search').addEventListener('input', updateMarkers);
           filter.addEventListener('change', updateMarkers);
+          document.querySelectorAll('.filter-checkbox').forEach(cb => cb.addEventListener('change', updateMarkers));
+
           updateMarkers();
         })
         .catch(error => {
