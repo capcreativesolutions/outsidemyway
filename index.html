@@ -34,24 +34,28 @@
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
 
-      const csvData = `name,latitude,longitude
-Barton Creek,30.263,-97.772
-Hamilton Pool,30.342,-98.126
-Lost Maples,29.817,-99.573`;
+      fetch('locations.csv')
+        .then(response => response.text())
+        .then(csvText => {
+          const lines = csvText.trim().split('\n');
+          const headers = lines[0].split(',');
 
-      const lines = csvData.trim().split('\n');
-      const headers = lines[0].split(',');
+          lines.slice(1).forEach(line => {
+            const fields = line.split(',');
+            const name = fields[0];
+            const lat = parseFloat(fields[1]);
+            const lon = parseFloat(fields[2]);
 
-      lines.slice(1).forEach(line => {
-        const fields = line.split(',');
-        const name = fields[0];
-        const lat = parseFloat(fields[1]);
-        const lon = parseFloat(fields[2]);
-
-        L.marker([lat, lon])
-          .addTo(map)
-          .bindPopup(`<strong>${name}</strong>`);
-      });
+            if (!isNaN(lat) && !isNaN(lon)) {
+              L.marker([lat, lon])
+                .addTo(map)
+                .bindPopup(`<strong>${name}</strong>`);
+            }
+          });
+        })
+        .catch(error => {
+          console.error("Failed to load CSV:", error);
+        });
     });
   </script>
 </body>
