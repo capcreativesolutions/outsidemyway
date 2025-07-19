@@ -111,8 +111,8 @@
       document.getElementById('searchInput').addEventListener('input', () => renderMarkers(allLocations));
       document.getElementById('categoryFilter').addEventListener('change', () => renderMarkers(allLocations));
 
-      // Load CSV
-      Papa.parse("https://raw.githubusercontent.com/capcreativesolutions/outsidemyway/main/cleaned-locations.csv", {
+      // Load CSV with CORS workaround
+      Papa.parse("https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/capcreativesolutions/outsidemyway/main/cleaned-locations.csv", {
         header: true,
         download: true,
         complete: function(results) {
