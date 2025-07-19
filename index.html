@@ -134,11 +134,13 @@
       };
 
       function getIcon(category) {
-        const color = colorAssignments[category] || "gray";
+        const color = colorAssignments[category] || null;
         if (!categoryIcons[category]) {
           categoryIcons[category] = new L.Icon({
-            iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png',
+            iconUrl: color
+              ? `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`
+              : 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
             iconSize: [25, 41],
             iconAnchor: [12, 41],
             popupAnchor: [1, -34],
