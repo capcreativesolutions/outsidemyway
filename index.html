@@ -14,23 +14,49 @@
       margin: 0;
       font-family: Arial, sans-serif;
     }
+    header {
+      display: flex;
+      align-items: center;
+      background-color: #2f6132;
+      padding: 10px;
+      color: white;
+    }
+    header img {
+      height: 40px;
+      margin-right: 10px;
+    }
+    header h1 {
+      font-size: 1.5em;
+      margin: 0;
+    }
     #controls {
+      display: flex;
+      flex-direction: column;
       position: absolute;
-      top: 10px;
+      top: 70px;
       left: 10px;
       z-index: 1000;
       background: white;
       padding: 10px;
       border-radius: 8px;
       box-shadow: 0 0 5px rgba(0,0,0,0.3);
+      gap: 5px;
     }
     #map {
-      height: 100vh;
+      height: calc(100vh - 60px);
       width: 100vw;
+    }
+    input, select {
+      padding: 5px;
+      font-size: 1em;
     }
   </style>
 </head>
 <body>
+  <header>
+    <img src="logo.png" alt="Outside My Way logo">
+    <h1>Outside My Way</h1>
+  </header>
   <div id="controls">
     <input type="text" id="search" placeholder="Search name...">
     <select id="categoryFilter">
