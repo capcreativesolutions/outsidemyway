@@ -98,12 +98,15 @@
       const categoryIcons = {};
       const colorAssignments = {
         "Free Camping": "gold",
+        "Camping": "red",
         "Swimming Hole": "blue",
         "Hiking": "green",
-        "Camping": "red",
         "Horseback Riding": "purple",
         "Fishing": "orange"
-        // Add other category-to-color mappings here as needed
+      };
+
+      const mergedCategories = {
+        "Camping": ["Camping", "Free Camping"],
       };
 
       function getIcon(category) {
@@ -137,7 +140,8 @@
 
             if (!isNaN(lat) && !isNaN(lon)) {
               const categoryList = categoryField.split(',').map(cat => cat.trim());
-              const icon = getIcon(categoryList[0]);
+              const primaryCategory = categoryList.includes("Free Camping") ? "Free Camping" : categoryList[0];
+              const icon = getIcon(primaryCategory);
 
               const marker = L.marker([lat, lon], { icon });
               marker.name = name;
