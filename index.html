@@ -50,6 +50,9 @@
       padding: 5px;
       font-size: 1em;
     }
+    select option {
+      font-size: 0.95em;
+    }
   </style>
 </head>
 <body>
@@ -79,6 +82,22 @@
 
       const markers = [];
       const categories = new Set();
+      const categoryIcons = {};
+
+      function getIcon(category) {
+        if (!categoryIcons[category]) {
+          const color = category === 'Free Camping' ? 'green' : category === 'Hiking' ? 'orange' : category === 'Swimming' ? 'blue' : 'red';
+          categoryIcons[category] = L.icon({
+            iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+          });
+        }
+        return categoryIcons[category];
+      }
 
       fetch('locations.csv')
         .then(response => response.text())
@@ -95,12 +114,15 @@
             const categoryField = row.category || "Other";
 
             if (!isNaN(lat) && !isNaN(lon)) {
-              const marker = L.marker([lat, lon])
+              const categoryList = categoryField.split(',').map(cat => cat.trim());
+              const icon = getIcon(categoryList[0]);
+
+              const marker = L.marker([lat, lon], { icon })
                 .addTo(map)
                 .bindPopup(`<strong>${name}</strong>`);
 
               marker.name = name;
-              marker.categories = categoryField.split(',').map(cat => cat.trim());
+              marker.categories = categoryList;
 
               markers.push(marker);
               marker.categories.forEach(cat => categories.add(cat));
