@@ -162,7 +162,7 @@
 
             if (!isNaN(lat) && !isNaN(lon)) {
               const categoryList = categoryField.split(',').map(cat => cat.trim().toLowerCase());
-              const primaryCategory = categoryList.includes("free camping") ? "Free Camping" : categoryList[0].replace(/^\w/, c => c.toUpperCase());
+              const primaryCategory = categoryList.includes("free camping") ? "Free Camping" : categoryList[0].replace(/\b\w/g, c => c.toUpperCase());
               const icon = getIcon(primaryCategory);
 
               const marker = L.marker([lat, lon], { icon });
@@ -218,6 +218,13 @@
           document.getElementById('search').addEventListener('input', updateMarkers);
           filter.addEventListener('change', updateMarkers);
           document.querySelectorAll('.filter-checkbox').forEach(cb => cb.addEventListener('change', updateMarkers));
+
+          filter.addEventListener('click', function(e) {
+            if (e.target.selected) {
+              e.target.selected = false;
+            }
+            updateMarkers();
+          });
 
           updateMarkers();
         })
