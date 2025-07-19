@@ -162,12 +162,13 @@
 
             if (!isNaN(lat) && !isNaN(lon)) {
               const categoryList = categoryField.split(',').map(cat => cat.trim().toLowerCase());
-              const primaryCategory = categoryList.includes("free camping") ? "Free Camping" : categoryList[0].replace(/\b\w/g, c => c.toUpperCase());
+              const normalizedCategories = categoryList.map(cat => cat === "hike" ? "hiking" : cat);
+              const primaryCategory = normalizedCategories.includes("free camping") ? "Free Camping" : normalizedCategories[0].replace(/\b\w/g, c => c.toUpperCase());
               const icon = getIcon(primaryCategory);
 
               const marker = L.marker([lat, lon], { icon });
               marker.name = name;
-              marker.categories = categoryList;
+              marker.categories = normalizedCategories;
               marker.description = row.description || "";
               marker.lat = lat;
               marker.lon = lon;
@@ -201,7 +202,7 @@
             const searchTerm = document.getElementById('search').value.toLowerCase();
             const selectedCategories = Array.from(document.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value.toLowerCase());
             const selectedDropdown = Array.from(filter.selectedOptions).map(opt => opt.value.toLowerCase());
-            const combinedCategories = [...selectedCategories, ...selectedDropdown];
+            const combinedCategories = [...new Set([...selectedCategories, ...selectedDropdown])];
             document.getElementById('results').innerHTML = "";
 
             markers.forEach(marker => {
@@ -218,13 +219,6 @@
           document.getElementById('search').addEventListener('input', updateMarkers);
           filter.addEventListener('change', updateMarkers);
           document.querySelectorAll('.filter-checkbox').forEach(cb => cb.addEventListener('change', updateMarkers));
-
-          filter.addEventListener('click', function(e) {
-            if (e.target.selected) {
-              e.target.selected = false;
-            }
-            updateMarkers();
-          });
 
           updateMarkers();
         })
