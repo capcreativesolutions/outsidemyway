@@ -52,8 +52,8 @@
     }
     #controls {
       position: absolute;
-      top: 70px;
-      left: 270px;
+      bottom: 20px;
+      left: 20px;
       background: white;
       box-shadow: 0 0 5px rgba(0,0,0,0.3);
       border-radius: 8px;
@@ -122,15 +122,15 @@
       const categoryIcons = {};
       const colorAssignments = {
         "Free Camping": "gold",
-        "Camping": "red",
-        "Swimming Hole": "blue",
-        "Hiking": "green",
-        "Horseback Riding": "purple",
-        "Fishing": "orange"
+        "Camping": "darkred",
+        "Swimming Hole": "deepskyblue",
+        "Hiking": "seagreen",
+        "Horseback Riding": "indigo",
+        "Fishing": "darkorange"
       };
 
       function getIcon(category) {
-        const color = colorAssignments[category] || "grey";
+        const color = colorAssignments[category] || "gray";
         if (!categoryIcons[category]) {
           categoryIcons[category] = L.icon({
             iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,
