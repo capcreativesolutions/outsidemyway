@@ -122,6 +122,8 @@
       const markers = [];
       const categories = new Set();
       const categoryIcons = {};
+      const excludedCategories = new Set(["cultrual", "fire lookouts", "interpretive programs", "picnicking", "playground park specialized sport site", "visitor center", "wildlife viewing"]);
+
       const colorAssignments = {
         "Free Camping": "gold",
         "Camping": "red",
@@ -186,7 +188,11 @@
               });
 
               markers.push(marker);
-              marker.categories.forEach(cat => categories.add(cat));
+              marker.categories.forEach(cat => {
+                if (!excludedCategories.has(cat)) {
+                  categories.add(cat);
+                }
+              });
             }
           });
 
