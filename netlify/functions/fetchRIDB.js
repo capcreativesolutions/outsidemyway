@@ -1,9 +1,15 @@
 const fetch = require('node-fetch');
 
 exports.handler = async function(event, context) {
-  // ✅ Hardcode the key for now — replace with your actual one
+  // Get the RIDB API key from environment variables
   const RIDB_API_KEY = process.env.RIDB_API_KEY;
 
+  // Fallback error if environment variable is missing
+  if (!RIDB_API_KEY) {
+    throw new Error("RIDB_API_KEY environment variable is not set.");
+  }
+
+  // Log to Netlify functions console for debugging
   console.log("RIDB_API_KEY:", RIDB_API_KEY ? "Received ✅" : "Missing ❌");
 
   const RIDB_ENDPOINT = 'https://ridb.recreation.gov/api/v1/facilities?limit=10';
@@ -20,9 +26,10 @@ exports.handler = async function(event, context) {
     }
 
     const data = await response.json();
+
     return {
       statusCode: 200,
-      body: JSON.stringify(data),
+      body: JSON.stringify(data)
     };
   } catch (err) {
     return {
@@ -31,4 +38,3 @@ exports.handler = async function(event, context) {
     };
   }
 };
-
