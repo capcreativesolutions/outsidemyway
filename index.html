@@ -92,6 +92,10 @@
     const markers = [];
     const uniqueTags = new Set();
 
+    function normalizeTags(tagString) {
+      return tagString.split(',').map(tag => tag.trim().toLowerCase()).filter(Boolean);
+    }
+
     function colorFromCategory(tags) {
       const t = tags.join(',').toLowerCase();
       if (t.includes("free")) return "gold";
@@ -105,12 +109,13 @@
       const lon = parseFloat(d.longitude || d.FacilityLongitude);
       if (!lat || !lon) return;
 
-      const name = d.name || d.FacilityName;
+      const name = d.name || d.FacilityName || "Unnamed Location";
       const desc = d.description || d.FacilityDescription || "";
-      const tags = (d.category || d.FacilityKeywords || "").toLowerCase().split(',');
+      const rawTags = d.category || d.FacilityKeywords || "";
+      const tags = normalizeTags(rawTags);
       const color = colorFromCategory(tags);
 
-      tags.forEach(t => uniqueTags.add(t.trim()));
+      tags.forEach(t => uniqueTags.add(t));
 
       const marker = L.circleMarker([lat, lon], {
         radius: 8,
@@ -132,7 +137,7 @@
     function applyFilters() {
       const checkboxes = document.querySelectorAll('.filter:checked');
       const query = document.getElementById('searchBox').value.toLowerCase();
-      const selected = Array.from(checkboxes).map(cb => cb.value);
+      const selected = Array.from(checkboxes).map(cb => cb.value.toLowerCase());
 
       markers.forEach(m => {
         const matches = selected.length === 0 || selected.some(tag => m.tags.includes(tag));
@@ -148,7 +153,7 @@
     function addDynamicFilters() {
       const container = document.getElementById("moreFilters");
       Array.from(uniqueTags).sort().forEach(tag => {
-        if (["free camping", "camping", "hiking", "swimming hole"].includes(tag)) return;
+        if (["free camping", "camping", "hiking", "swimming hole", "cultural", "visitor center", "interpretive programs", "picnicking", "specialized sport site", "playground park", "fire lookouts"].includes(tag)) return;
         const label = document.createElement("label");
         label.innerHTML = `<input type="checkbox" class="filter" value="${tag}"> ${tag.charAt(0).toUpperCase() + tag.slice(1)}`;
         container.appendChild(label);
@@ -172,4 +177,5 @@
   </script>
 </body>
 </html>
+
 
