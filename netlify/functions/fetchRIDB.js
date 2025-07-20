@@ -3,8 +3,8 @@ const fetch = require('node-fetch');
 exports.handler = async function(event, context) {
   const RIDB_API_KEY = process.env.RIDB_API_KEY;
 
-  // TEMP DEBUG LOG - helps us confirm the key is injected from Netlify
-  console.log("RIDB_API_KEY received:", RIDB_API_KEY ? "Yes ✅" : "No ❌");
+  // ✅ DEBUG OUTPUT — this goes to the Netlify logs
+  console.log("RIDB_API_KEY:", RIDB_API_KEY ? "Received ✅" : "Missing ❌");
 
   const RIDB_ENDPOINT = 'https://ridb.recreation.gov/api/v1/facilities?limit=10';
 
@@ -31,3 +31,4 @@ exports.handler = async function(event, context) {
     };
   }
 };
+
