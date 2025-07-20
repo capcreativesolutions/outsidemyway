@@ -127,6 +127,65 @@
     <p id="uploadStatus"></p>
   </div>
 
+  <!-- OUTLINE NOTES FOR PROJECT REFERENCE -->
+  <!--
+  ========================== OUTSIDE MY WAY - PROJECT SNAPSHOT ==========================
+  ✅ Hosting & Tools:
+    • GitHub (via web) — stores and updates project files, version control
+    • Netlify — deploys site automatically from GitHub repo
+    • Firebase Firestore — stores locations data from CSV uploads
+    • LeafletJS — renders interactive map with markers
+
+  ✅ Chromebook Limitations:
+    • No Git CLI / terminal or local repo setup
+    • No code editors like VSCode installed
+    • Cannot download large files (.gov full dataset crashes system)
+    • All edits made through ChatGPT + GitHub web + Netlify UI
+
+  ✅ DNS:
+    • Domain: outsidemyway.com
+    • Status: Still not consistently redirecting (CNAME + A record verified)
+
+  ✅ CSV Format (Headers):
+    name, lat, lng, category, features, state, cost, notes, source, phone, url, directions
+
+  ✅ Interface Features:
+    • Upload CSV to Firebase (manual via admin-only form)
+    • Filter locations by checkboxes (Camping, Hiking, Swimming Holes, etc.)
+    • Search by name in map overlay
+    • Map auto-zooms to Texas
+
+  ✅ Issues/Backlog:
+    • No working logo uploaded — using placeholder "logo.png"
+    • RIDB Fetch blocked by CORS (moving to Netlify functions next)
+    • Need to document RIDB API access in secure way (input key manually)
+    • Consider new chat when current window is glitchy (typing delays, memory loss)
+
+  ✅ LIVE PROJECT STATUS (Updated July 18, 2025)
+    • Current focus: Securely fetch RIDB.gov data using Netlify Functions (CORS workaround)
+    • Next Step: Create `netlify/functions/fetchRIDB.js` using Netlify UI
+    • Why: Direct fetch failed due to CORS; Option 2 (serverless function) chosen for security and compatibility with Firebase
+    • GitHub/Netlify status: Index.html synced with Canvas and includes manual RIDB API key input
+    • Firebase working: CSV uploader and test pin confirmed on map
+    • DNS status: Awaiting full propagation for outsidemyway.com
+
+  ✅ RIDB INTEGRATION CHECKLIST
+    [x] Verified RIDB.gov API key creation
+    [x] Attempted direct fetch from client — blocked by CORS
+    [x] Manual key entry input added to HTML
+    [ ] Create fetchRIDB Netlify Function for proxy fetch
+    [ ] Test Netlify function to retrieve data from RIDB
+    [ ] Upload relevant data fields to Firebase
+
+  💤 FUTURE FEATURES (Later Phase or Paused)
+    • User-submitted pins or location contributions
+    • Saved list or favorite markers per user
+    • Account login/auth for content moderation
+    • Real-time collaboration or comments per pin
+
+  ========================== END PROJECT SNAPSHOT ==========================
+  -->
+
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
