@@ -1,8 +1,8 @@
 const fetch = require('node-fetch');
 
 exports.handler = async function(event, context) {
-  const RIDB_API_KEY = process.env.RIDB_API_KEY;
-
+  const apiKey = "45315405-be74-484f-8302-fb72ce14c6b7";
+  
   // ✅ DEBUG OUTPUT — this goes to the Netlify logs
   console.log("RIDB_API_KEY:", RIDB_API_KEY ? "Received ✅" : "Missing ❌");
 
