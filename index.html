@@ -120,6 +120,10 @@
     <h3>CSV Upload for Admins Only</h3>
     <input type="file" id="csvFile" accept=".csv" />
     <button onclick="uploadCSV()">Upload CSV</button>
+    <br><br>
+    <label for="ridbKey">RIDB API Key:</label>
+    <input type="text" id="ridbKey" placeholder="Enter your RIDB API key" style="width: 300px;">
+    <button onclick="fetchRIDBSample()">Fetch RIDB Sample</button>
     <p id="uploadStatus"></p>
   </div>
 
@@ -148,11 +152,8 @@
       }).addTo(map);
 
       db.collection("locations").get().then((querySnapshot) => {
-        console.log("📍 Loaded location markers:");
         querySnapshot.forEach((doc) => {
           const data = doc.data();
-          console.log(doc.id, "=>", data);
-
           if (data.lat && data.lng) {
             const marker = L.marker([data.lat, data.lng]).addTo(map);
             marker.bindPopup(`<b>${data.name}</b><br>${data.category || ''}`);
@@ -192,14 +193,16 @@
                 state: row.state || "",
                 cost: row.cost || "",
                 notes: row.notes || "",
-                source: row.source || ""
+                source: row.source || "",
+                phone: row.phone || "",
+                url: row.url || "",
+                directions: row.directions || ""
               });
               counter++;
             }
 
             if ((index + 1) % 50 === 0 || index === rows.length - 1) {
               batch.commit().then(() => {
-                console.log(`Committed ${counter} locations.`);
                 status.textContent = `Upload complete: ${counter} locations added.`;
               }).catch(error => {
                 console.error("Upload failed:", error);
@@ -210,6 +213,31 @@
             }
           });
         }
+      });
+    }
+
+    function fetchRIDBSample() {
+      const RIDB_API_KEY = document.getElementById("ridbKey").value.trim();
+      if (!RIDB_API_KEY) {
+        alert("Please enter a valid RIDB API key.");
+        return;
+      }
+
+      const RIDB_URL = `https://ridb.recreation.gov/api/v1/recareas?limit=3`;
+
+      fetch(RIDB_URL, {
+        headers: {
+          apikey: RIDB_API_KEY
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log("🧭 RIDB Sample Data:", data);
+        alert("Fetched sample from RIDB — check console.");
+      })
+      .catch(error => {
+        console.error("RIDB fetch error:", error);
+        alert("Failed to fetch RIDB sample.");
       });
     }
   </script>
