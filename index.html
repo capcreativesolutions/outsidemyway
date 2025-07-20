@@ -79,6 +79,12 @@
       margin-bottom: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
+    #csv-uploader {
+      margin: 10px;
+      padding: 10px;
+      background: #f3f3f3;
+      border-top: 1px solid #ccc;
+    }
   </style>
 </head>
 <body>
@@ -110,6 +116,13 @@
   </div>
   <div id="results"></div>
 
+  <div id="csv-uploader">
+    <h3>CSV Upload for Admins Only</h3>
+    <input type="file" id="csvFile" accept=".csv" />
+    <button onclick="uploadCSV()">Upload CSV</button>
+    <p id="uploadStatus"></p>
+  </div>
+
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -134,7 +147,6 @@
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
 
-      // Read locations from Firestore 'locations' collection
       db.collection("locations").get().then((querySnapshot) => {
         console.log("📍 Loaded location markers:");
         querySnapshot.forEach((doc) => {
@@ -150,6 +162,51 @@
         console.error("Error loading markers:", error);
       });
     });
+
+    function uploadCSV() {
+      const fileInput = document.getElementById("csvFile");
+      const status = document.getElementById("uploadStatus");
+
+      if (!fileInput.files.length) {
+        status.textContent = "Please select a CSV file.";
+        return;
+      }
+
+      Papa.parse(fileInput.files[0], {
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          const rows = results.data;
+          let batch = db.batch();
+          let counter = 0;
+
+          rows.forEach((row, index) => {
+            if (row.lat && row.lng && row.name) {
+              const ref = db.collection("locations").doc();
+              batch.set(ref, {
+                name: row.name,
+                lat: parseFloat(row.lat),
+                lng: parseFloat(row.lng),
+                category: row.category || "General"
+              });
+              counter++;
+            }
+
+            if ((index + 1) % 50 === 0 || index === rows.length - 1) {
+              batch.commit().then(() => {
+                console.log(`Committed ${counter} locations.`);
+                status.textContent = `Upload complete: ${counter} locations added.`;
+              }).catch(error => {
+                console.error("Upload failed:", error);
+                status.textContent = "Upload failed. See console for details.";
+              });
+              batch = db.batch();
+              counter = 0;
+            }
+          });
+        }
+      });
+    }
   </script>
 </body>
 </html>
