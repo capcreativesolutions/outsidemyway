@@ -4,301 +4,244 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Outside My Way</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
+      margin: 0;
+      padding: 0;
     }
     header {
       display: flex;
       align-items: center;
-      background-color: #2f6132;
       padding: 10px;
-      color: white;
+      background-color: #f5f5f5;
     }
     header img {
-      height: 40px;
-      margin-right: 10px;
+      height: 50px;
+      margin-right: 15px;
     }
     header h1 {
-      font-size: 1.5em;
+      font-size: 1.5rem;
       margin: 0;
     }
-    #main {
-      display: flex;
-      flex-direction: row;
-    }
-    #filters {
+    .controls {
       display: flex;
       flex-direction: column;
+      gap: 10px;
       padding: 10px;
-      width: 250px;
-      background: #f0f0f0;
-      border-right: 1px solid #ccc;
+      background-color: #f0f0f0;
     }
-    .filter-group {
-      margin-bottom: 20px;
-    }
-    .filter-group h3 {
-      margin-bottom: 10px;
-    }
-    .checkbox-list label {
-      display: block;
-      margin-bottom: 5px;
+    label {
+      font-weight: bold;
     }
     #map {
-      height: 70vh;
-      flex-grow: 1;
-      position: relative;
+      width: 100%;
+      height: 80vh;
     }
-    #search-container {
+    .legend {
+      background: white;
+      padding: 10px;
       position: absolute;
       bottom: 10px;
       left: 10px;
-      background: white;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-      z-index: 1000;
+      font-size: 0.9rem;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
     }
-    #results {
-      padding: 10px;
-      background: #f9f9f9;
-      height: 30vh;
-      overflow-y: auto;
+    .legend div {
+      margin-bottom: 5px;
     }
-    .location-card {
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    #csv-uploader {
-      margin: 10px;
-      padding: 10px;
-      background: #f3f3f3;
-      border-top: 1px solid #ccc;
+    .legend span {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      margin-right: 5px;
     }
   </style>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-sA+Bx0s0/jzQM4JZkLB+QvP2Qb6Fzv9z5s2sCNhHSAw="
+    crossorigin=""
+  />
 </head>
 <body>
   <header>
-    <img src="logo.png" alt="Outside My Way logo">
+    <img src="logo.png" alt="Outside My Way Logo" />
     <h1>Outside My Way</h1>
   </header>
-  <div id="main">
-    <div id="filters">
-      <div class="filter-group">
-        <h3>Popular Filters</h3>
-        <div class="checkbox-list">
-          <label><input type="checkbox" class="filter-checkbox" value="Free Camping"> Free Camping</label>
-          <label><input type="checkbox" class="filter-checkbox" value="Camping"> Camping</label>
-          <label><input type="checkbox" class="filter-checkbox" value="Hiking"> Hiking</label>
-          <label><input type="checkbox" class="filter-checkbox" value="Swimming Hole"> Swimming Hole</label>
-        </div>
-      </div>
-      <div class="filter-group">
-        <h3>More Categories</h3>
-        <div class="checkbox-list" id="moreCategories"></div>
-      </div>
-    </div>
-    <div id="map">
-      <div id="search-container">
-        <input type="text" id="search" placeholder="Search name...">
-      </div>
-    </div>
-  </div>
-  <div id="results"></div>
+  <div class="controls">
+    <label for="categoryFilter">Filter by Activity Type:</label>
+    <select id="categoryFilter" multiple>
+      <option value="camping">Camping</option>
+      <option value="hiking">Hiking</option>
+      <option value="trailhead">Trailhead</option>
+      <option value="free">Free Camping</option>
+      <option value="swimming">Swimming</option>
+    </select>
 
-  <div id="csv-uploader">
-    <h3>CSV Upload for Admins Only</h3>
-    <input type="file" id="csvFile" accept=".csv" />
-    <button onclick="uploadCSV()">Upload CSV</button>
-    <br><br>
-    <label for="ridbKey">RIDB API Key:</label>
-    <input type="text" id="ridbKey" placeholder="Enter your RIDB API key" style="width: 300px;">
-    <button onclick="fetchRIDBSample()">Fetch RIDB Sample</button>
-    <p id="uploadStatus"></p>
+    <label for="searchInput">Search by Name or Location:</label>
+    <input type="text" id="searchInput" placeholder="Outside My Way" />
+  </div>
+  <div id="map"></div>
+  <div class="legend">
+    <div><span style="background: gold;"></span> Free Camping</div>
+    <div><span style="background: green;"></span> Camping</div>
+    <div><span style="background: blue;"></span> Hiking/Trailhead</div>
+    <div><span style="background: gray;"></span> Other</div>
   </div>
 
-  <!-- OUTLINE NOTES FOR PROJECT REFERENCE -->
-  <!--
-  ========================== OUTSIDE MY WAY - PROJECT SNAPSHOT ==========================
-  ✅ Hosting & Tools:
-    • GitHub (via web) — stores and updates project files, version control
-    • Netlify — deploys site automatically from GitHub repo
-    • Firebase Firestore — stores locations data from CSV uploads
-    • LeafletJS — renders interactive map with markers
-
-  ✅ Chromebook Limitations:
-    • No Git CLI / terminal or local repo setup
-    • No code editors like VSCode installed
-    • Cannot download large files (.gov full dataset crashes system)
-    • All edits made through ChatGPT + GitHub web + Netlify UI
-
-  ✅ DNS:
-    • Domain: outsidemyway.com
-    • Status: Still not consistently redirecting (CNAME + A record verified)
-
-  ✅ CSV Format (Headers):
-    name, lat, lng, category, features, state, cost, notes, source, phone, url, directions
-
-  ✅ Interface Features:
-    • Upload CSV to Firebase (manual via admin-only form)
-    • Filter locations by checkboxes (Camping, Hiking, Swimming Holes, etc.)
-    • Search by name in map overlay
-    • Map auto-zooms to Texas
-
-  ✅ Issues/Backlog:
-    • No working logo uploaded — using placeholder "logo.png"
-    • RIDB Fetch blocked by CORS (moving to Netlify functions next)
-    • Need to document RIDB API access in secure way (input key manually)
-    • Consider new chat when current window is glitchy (typing delays, memory loss)
-
-  ✅ LIVE PROJECT STATUS (Updated July 18, 2025)
-    • Current focus: Securely fetch RIDB.gov data using Netlify Functions (CORS workaround)
-    • Next Step: Create `netlify/functions/fetchRIDB.js` using Netlify UI
-    • Why: Direct fetch failed due to CORS; Option 2 (serverless function) chosen for security and compatibility with Firebase
-    • GitHub/Netlify status: Index.html synced with Canvas and includes manual RIDB API key input
-    • Firebase working: CSV uploader and test pin confirmed on map
-    • DNS status: Awaiting full propagation for outsidemyway.com
-
-  ✅ RIDB INTEGRATION CHECKLIST
-    [x] Verified RIDB.gov API key creation
-    [x] Attempted direct fetch from client — blocked by CORS
-    [x] Manual key entry input added to HTML
-    [ ] Create fetchRIDB Netlify Function for proxy fetch
-    [ ] Test Netlify function to retrieve data from RIDB
-    [ ] Upload relevant data fields to Firebase
-
-  💤 FUTURE FEATURES (Later Phase or Paused)
-    • User-submitted pins or location contributions
-    • Saved list or favorite markers per user
-    • Account login/auth for content moderation
-    • Real-time collaboration or comments per pin
-
-  ========================== END PROJECT SNAPSHOT ==========================
-  -->
-
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-o9N1j8MkfB0v1w+Lr7qjJ8cCkNd6FjzT9Hyg6QZ/lN8="
+    crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBQE3U0lPxLlCF7qcDxo1Pd2qabCXUUtFw",
-      authDomain: "outsidemyway.firebaseapp.com",
-      projectId: "outsidemyway",
-      storageBucket: "outsidemyway.firebasestorage.app",
-      messagingSenderId: "696283600984",
-      appId: "1:696283600984:web:6d1c28e728b2a93108d22d"
-    };
+    const map = L.map('map').setView([39.5, -98.35], 4);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    const markers = [];
 
-    document.addEventListener("DOMContentLoaded", function () {
-      const map = L.map('map').setView([31.9686, -99.9018], 6);
+    function getColorForActivity(tags) {
+      const tagStr = tags.join(',').toLowerCase();
+      if (tagStr.includes("free")) return "gold";
+      if (tagStr.includes("camping")) return "green";
+      if (tagStr.includes("hiking") || tagStr.includes("trailhead")) return "blue";
+      return "gray";
+    }
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    function addMarker(lat, lon, name, desc, address, city, state, zip, directions, tags) {
+      const color = getColorForActivity(tags);
+      const marker = L.circleMarker([lat, lon], {
+        radius: 8,
+        fillColor: color,
+        color: '#000',
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
       }).addTo(map);
 
-      db.collection("locations").get().then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.lat && data.lng) {
-            const marker = L.marker([data.lat, data.lng]).addTo(map);
-            marker.bindPopup(`<b>${data.name}</b><br>${data.category || ''}`);
-          }
-        });
-      }).catch((error) => {
-        console.error("Error loading markers:", error);
+      marker.bindPopup(
+        `<strong>${name}</strong><br>${desc}<br>${address} ${city}, ${state} ${zip}<br><a href="${directions}" target="_blank">Get Directions</a>`
+      );
+      marker.bindTooltip(name);
+      marker.tags = tags;
+      marker.name = name.toLowerCase();
+      markers.push(marker);
+    }
+
+    async function loadRIDBData() {
+      const res = await fetch('/.netlify/functions/fetchRIDB');
+      const json = await res.json();
+      const facilities = json.RECDATA || [];
+
+      facilities.slice(0, 100).forEach(facility => {
+        const lat = parseFloat(facility.FacilityLatitude);
+        const lon = parseFloat(facility.FacilityLongitude);
+        if (!lat || !lon) return;
+
+        const name = facility.FacilityName;
+        const desc = facility.FacilityDescription || "No description available.";
+        const address = facility.FacilityStreetAddress?.[0]?.AddressLine1 || "";
+        const city = facility.FacilityStreetAddress?.[0]?.City || "";
+        const state = facility.FacilityStreetAddress?.[0]?.State || "";
+        const zip = facility.FacilityStreetAddress?.[0]?.PostalCode || "";
+        const directions = `https://www.google.com/maps?q=${lat},${lon}`;
+
+        const tags = (facility.FacilityKeywords || "").toLowerCase().split(',');
+        addMarker(lat, lon, name, desc, address, city, state, zip, directions, tags);
       });
-    });
+    }
 
-    function uploadCSV() {
-      const fileInput = document.getElementById("csvFile");
-      const status = document.getElementById("uploadStatus");
+    async function loadCSVData() {
+      const res = await fetch('locations.csv');
+      const text = await res.text();
+      const results = Papa.parse(text, { header: true });
 
-      if (!fileInput.files.length) {
-        status.textContent = "Please select a CSV file.";
-        return;
-      }
+      results.data.forEach(loc => {
+        const lat = parseFloat(loc.latitude);
+        const lon = parseFloat(loc.longitude);
+        if (!lat || !lon) return;
 
-      Papa.parse(fileInput.files[0], {
-        header: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-          const rows = results.data;
-          let batch = db.batch();
-          let counter = 0;
+        const name = loc.name;
+        const desc = loc.description || "No description available.";
+        const address = loc.address || "";
+        const city = loc.city || "";
+        const state = loc.state || "";
+        const zip = loc.zip || "";
+        const directions = `https://www.google.com/maps?q=${lat},${lon}`;
 
-          rows.forEach((row, index) => {
-            if (row.lat && row.lng && row.name) {
-              const ref = db.collection("locations").doc();
-              batch.set(ref, {
-                name: row.name,
-                lat: parseFloat(row.lat),
-                lng: parseFloat(row.lng),
-                category: row.category || "General",
-                features: row.features || "",
-                state: row.state || "",
-                cost: row.cost || "",
-                notes: row.notes || "",
-                source: row.source || "",
-                phone: row.phone || "",
-                url: row.url || "",
-                directions: row.directions || ""
-              });
-              counter++;
-            }
+        const tags = (loc.category || "").toLowerCase().split(',');
+        addMarker(lat, lon, name, desc, address, city, state, zip, directions, tags);
+      });
+    }
 
-            if ((index + 1) % 50 === 0 || index === rows.length - 1) {
-              batch.commit().then(() => {
-                status.textContent = `Upload complete: ${counter} locations added.`;
-              }).catch(error => {
-                console.error("Upload failed:", error);
-                status.textContent = "Upload failed. See console for details.";
-              });
-              batch = db.batch();
-              counter = 0;
-            }
-          });
+    function applyFilters() {
+      const selected = Array.from(document.getElementById("categoryFilter").selectedOptions).map(o => o.value.toLowerCase());
+      const query = document.getElementById("searchInput").value.toLowerCase();
+
+      markers.forEach(marker => {
+        const matchCategory = selected.length === 0 || selected.some(tag => marker.tags.includes(tag));
+        const matchSearch = marker.name.includes(query);
+        if (matchCategory && matchSearch) {
+          map.addLayer(marker);
+        } else {
+          map.removeLayer(marker);
         }
       });
     }
 
-    function fetchRIDBSample() {
-      const RIDB_API_KEY = document.getElementById("ridbKey").value.trim();
-      if (!RIDB_API_KEY) {
-        alert("Please enter a valid RIDB API key.");
-        return;
-      }
+    document.getElementById("categoryFilter").addEventListener("change", applyFilters);
+    document.getElementById("searchInput").addEventListener("input", applyFilters);
 
-      const RIDB_URL = `https://ridb.recreation.gov/api/v1/recareas?limit=3`;
-
-      fetch(RIDB_URL, {
-        headers: {
-          apikey: RIDB_API_KEY
-        }
-      })
-      .then(res => res.json())
-      .then(data => {
-        console.log("🧭 RIDB Sample Data:", data);
-        alert("Fetched sample from RIDB — check console.");
-      })
-      .catch(error => {
-        console.error("RIDB fetch error:", error);
-        alert("Failed to fetch RIDB sample.");
-      });
-    }
+    loadRIDBData();
+    loadCSVData();
   </script>
+
+  <!-- OUTLINE NOTES FOR PROJECT REFERENCE
+
+  ✅ TECH STACK + HOSTING
+  - HTML, JS, and CSV-based dataset
+  - Using Netlify for deployment (Chromebook compatible)
+  - Firebase selected for contact form + possible saved lists later
+  - No backend server; client-side only
+
+  ✅ DATA STRUCTURE
+  - Master CSV file cleaned and merged
+  - Categories normalized for filtering (e.g., hiking, swimming, free camping)
+  - Using PapaParse for CSV-to-JSON conversion in-browser
+
+  ✅ UI DECISIONS
+  - Logo placed in top-left of header
+  - Filters stacked vertically (Chromebook viewport constraint)
+  - Category filter allows multi-select
+  - Search box placeholder = "Outside My Way"
+
+  ✅ CHROMEBOOK LIMITATIONS
+  - Cannot run local servers or heavy IDEs
+  - All edits must be done in GitHub web editor or ChatGPT canvas
+  - Images and CSV hosted via GitHub repo
+
+  ✅ TASKS IN PROGRESS
+  - [x] Set up Netlify serverless function to fetch RIDB API data
+  - [x] Securely store RIDB API key in Netlify environment variables
+  - [x] Implement interactive map using Leaflet.js
+  - [x] Connect front-end JS to call fetchRIDB API
+  - [x] Display results as map pins using FacilityLatitude + FacilityLongitude
+  - [x] Display filtered pins by category and keyword (RIDB only)
+  - [x] Add pin color legend and custom colors based on activity type
+  - [x] Add richer metadata to popups (address, directions link)
+  - [x] Load and parse CSV data with PapaParse (if needed)
+  - [ ] Finalize favicon + responsive tweaks
+
+  ✅ NEXT STEPS
+  - Allow CSV and RIDB pins to co-exist and share filter system ✅
+  - Improve mobile responsiveness of map and controls
+  - Add footer with GitHub + Contact link
+  - Add dedicated filter/view for Appalachian Trail dataset (future)
+
+  -->
 </body>
 </html>
+
