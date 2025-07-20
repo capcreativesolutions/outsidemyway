@@ -4,244 +4,240 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Outside My Way</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
-      padding: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
     }
     header {
       display: flex;
       align-items: center;
+      background-color: #2f6132;
       padding: 10px;
-      background-color: #f5f5f5;
+      color: white;
     }
     header img {
-      height: 50px;
-      margin-right: 15px;
+      height: 40px;
+      margin-right: 10px;
     }
     header h1 {
-      font-size: 1.5rem;
+      font-size: 1.5em;
       margin: 0;
     }
-    .controls {
+    #main {
+      display: flex;
+      flex-direction: row;
+    }
+    #filters {
       display: flex;
       flex-direction: column;
-      gap: 10px;
       padding: 10px;
-      background-color: #f0f0f0;
+      width: 250px;
+      background: #f0f0f0;
+      border-right: 1px solid #ccc;
     }
-    label {
-      font-weight: bold;
+    .filter-group {
+      margin-bottom: 20px;
+    }
+    .filter-group h3 {
+      margin-bottom: 10px;
+    }
+    .checkbox-list label {
+      display: block;
+      margin-bottom: 5px;
     }
     #map {
-      width: 100%;
-      height: 80vh;
+      height: 70vh;
+      flex-grow: 1;
+      position: relative;
     }
-    .legend {
-      background: white;
-      padding: 10px;
+    #search-container {
       position: absolute;
       bottom: 10px;
       left: 10px;
-      font-size: 0.9rem;
-      border-radius: 5px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
     }
-    .legend div {
-      margin-bottom: 5px;
+    #results {
+      padding: 10px;
+      background: #f9f9f9;
+      height: 30vh;
+      overflow-y: auto;
     }
-    .legend span {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      margin-right: 5px;
+    .location-card {
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
   </style>
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-sA+Bx0s0/jzQM4JZkLB+QvP2Qb6Fzv9z5s2sCNhHSAw="
-    crossorigin=""
-  />
 </head>
 <body>
   <header>
-    <img src="logo.png" alt="Outside My Way Logo" />
+    <img src="logo.png" alt="Outside My Way logo">
     <h1>Outside My Way</h1>
   </header>
-  <div class="controls">
-    <label for="categoryFilter">Filter by Activity Type:</label>
-    <select id="categoryFilter" multiple>
-      <option value="camping">Camping</option>
-      <option value="hiking">Hiking</option>
-      <option value="trailhead">Trailhead</option>
-      <option value="free">Free Camping</option>
-      <option value="swimming">Swimming</option>
-    </select>
-
-    <label for="searchInput">Search by Name or Location:</label>
-    <input type="text" id="searchInput" placeholder="Outside My Way" />
+  <div id="main">
+    <div id="filters">
+      <div class="filter-group">
+        <h3>Popular Filters</h3>
+        <div class="checkbox-list">
+          <label><input type="checkbox" class="filter-checkbox" value="Free Camping"> Free Camping</label>
+          <label><input type="checkbox" class="filter-checkbox" value="Camping"> Camping</label>
+          <label><input type="checkbox" class="filter-checkbox" value="Hiking"> Hiking</label>
+          <label><input type="checkbox" class="filter-checkbox" value="Swimming Hole"> Swimming Hole</label>
+        </div>
+      </div>
+      <div class="filter-group">
+        <h3>More Categories</h3>
+        <div class="checkbox-list" id="moreCategories"></div>
+      </div>
+    </div>
+    <div id="map">
+      <div id="search-container">
+        <input type="text" id="search" placeholder="Search name...">
+      </div>
+    </div>
   </div>
-  <div id="map"></div>
-  <div class="legend">
-    <div><span style="background: gold;"></span> Free Camping</div>
-    <div><span style="background: green;"></span> Camping</div>
-    <div><span style="background: blue;"></span> Hiking/Trailhead</div>
-    <div><span style="background: gray;"></span> Other</div>
-  </div>
+  <div id="results"></div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-o9N1j8MkfB0v1w+Lr7qjJ8cCkNd6FjzT9Hyg6QZ/lN8="
-    crossorigin=""></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const map = L.map('map').setView([39.5, -98.35], 4);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+    document.addEventListener("DOMContentLoaded", function () {
+      const map = L.map('map').setView([31.9686, -99.9018], 6);
 
-    const markers = [];
-
-    function getColorForActivity(tags) {
-      const tagStr = tags.join(',').toLowerCase();
-      if (tagStr.includes("free")) return "gold";
-      if (tagStr.includes("camping")) return "green";
-      if (tagStr.includes("hiking") || tagStr.includes("trailhead")) return "blue";
-      return "gray";
-    }
-
-    function addMarker(lat, lon, name, desc, address, city, state, zip, directions, tags) {
-      const color = getColorForActivity(tags);
-      const marker = L.circleMarker([lat, lon], {
-        radius: 8,
-        fillColor: color,
-        color: '#000',
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.8
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
 
-      marker.bindPopup(
-        `<strong>${name}</strong><br>${desc}<br>${address} ${city}, ${state} ${zip}<br><a href="${directions}" target="_blank">Get Directions</a>`
-      );
-      marker.bindTooltip(name);
-      marker.tags = tags;
-      marker.name = name.toLowerCase();
-      markers.push(marker);
-    }
+      const markers = [];
+      const categories = new Set();
+      const categoryIcons = {};
+      const excludedCategories = new Set(["cultrual", "fire lookouts", "interpretive programs", "picnicking", "playground park specialized sport site", "visitor center", "wildlife viewing"]);
 
-    async function loadRIDBData() {
-      const res = await fetch('/.netlify/functions/fetchRIDB');
-      const json = await res.json();
-      const facilities = json.RECDATA || [];
+      const colorAssignments = {
+        "Free Camping": "gold",
+        "Camping": "red",
+        "Swimming Hole": "blue",
+        "Hiking": "green",
+        "Horseback Riding": "purple",
+        "Fishing": "orange"
+      };
 
-      facilities.slice(0, 100).forEach(facility => {
-        const lat = parseFloat(facility.FacilityLatitude);
-        const lon = parseFloat(facility.FacilityLongitude);
-        if (!lat || !lon) return;
-
-        const name = facility.FacilityName;
-        const desc = facility.FacilityDescription || "No description available.";
-        const address = facility.FacilityStreetAddress?.[0]?.AddressLine1 || "";
-        const city = facility.FacilityStreetAddress?.[0]?.City || "";
-        const state = facility.FacilityStreetAddress?.[0]?.State || "";
-        const zip = facility.FacilityStreetAddress?.[0]?.PostalCode || "";
-        const directions = `https://www.google.com/maps?q=${lat},${lon}`;
-
-        const tags = (facility.FacilityKeywords || "").toLowerCase().split(',');
-        addMarker(lat, lon, name, desc, address, city, state, zip, directions, tags);
-      });
-    }
-
-    async function loadCSVData() {
-      const res = await fetch('locations.csv');
-      const text = await res.text();
-      const results = Papa.parse(text, { header: true });
-
-      results.data.forEach(loc => {
-        const lat = parseFloat(loc.latitude);
-        const lon = parseFloat(loc.longitude);
-        if (!lat || !lon) return;
-
-        const name = loc.name;
-        const desc = loc.description || "No description available.";
-        const address = loc.address || "";
-        const city = loc.city || "";
-        const state = loc.state || "";
-        const zip = loc.zip || "";
-        const directions = `https://www.google.com/maps?q=${lat},${lon}`;
-
-        const tags = (loc.category || "").toLowerCase().split(',');
-        addMarker(lat, lon, name, desc, address, city, state, zip, directions, tags);
-      });
-    }
-
-    function applyFilters() {
-      const selected = Array.from(document.getElementById("categoryFilter").selectedOptions).map(o => o.value.toLowerCase());
-      const query = document.getElementById("searchInput").value.toLowerCase();
-
-      markers.forEach(marker => {
-        const matchCategory = selected.length === 0 || selected.some(tag => marker.tags.includes(tag));
-        const matchSearch = marker.name.includes(query);
-        if (matchCategory && matchSearch) {
-          map.addLayer(marker);
-        } else {
-          map.removeLayer(marker);
+      function getIcon(category) {
+        const color = colorAssignments[category] || null;
+        if (!categoryIcons[category]) {
+          categoryIcons[category] = new L.Icon({
+            iconUrl: color
+              ? `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`
+              : 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+          });
         }
-      });
-    }
+        return categoryIcons[category];
+      }
 
-    document.getElementById("categoryFilter").addEventListener("change", applyFilters);
-    document.getElementById("searchInput").addEventListener("input", applyFilters);
+      fetch('locations.csv')
+        .then(response => response.text())
+        .then(csvText => {
+          const parsed = Papa.parse(csvText, {
+            header: true,
+            skipEmptyLines: true,
+          });
 
-    loadRIDBData();
-    loadCSVData();
+          parsed.data.forEach(row => {
+            const name = row.name || "Unnamed";
+            const lat = parseFloat(row.latitude);
+            const lon = parseFloat(row.longitude);
+            const categoryField = row.category || "Other";
+
+            if (!isNaN(lat) && !isNaN(lon)) {
+              const categoryList = categoryField.split(',').map(cat => cat.trim().toLowerCase());
+              const normalizedCategories = categoryList.map(cat => cat === "hike" ? "hiking" : cat);
+              const primaryCategory = normalizedCategories.includes("free camping") ? "Free Camping" : normalizedCategories[0].replace(/\b\w/g, c => c.toUpperCase());
+              const icon = getIcon(primaryCategory);
+
+              const marker = L.marker([lat, lon], { icon });
+              marker.name = name;
+              marker.categories = normalizedCategories;
+              marker.description = row.description || "";
+              marker.lat = lat;
+              marker.lon = lon;
+
+              marker.on('click', () => {
+                const resultDiv = document.getElementById('results');
+                resultDiv.innerHTML = `
+                  <div class="location-card">
+                    <strong>${marker.name}</strong><br>
+                    <em>${marker.categories.join(', ')}</em><br>
+                    <p>${marker.description}</p>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${marker.lat},${marker.lon}" target="_blank">Navigate with Google Maps</a>
+                  </div>
+                `;
+              });
+
+              markers.push(marker);
+              marker.categories.forEach(cat => {
+                if (!excludedCategories.has(cat)) {
+                  categories.add(cat);
+                }
+              });
+            }
+          });
+
+          const moreCategoriesDiv = document.getElementById('moreCategories');
+          Array.from(categories).sort().forEach(cat => {
+            const label = document.createElement('label');
+            label.innerHTML = `<input type="checkbox" class="more-category-checkbox" value="${cat}"> ${cat.charAt(0).toUpperCase() + cat.slice(1)}`;
+            moreCategoriesDiv.appendChild(label);
+          });
+
+          function updateMarkers() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const selectedCategories = Array.from(document.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value.toLowerCase());
+            const selectedMoreCategories = Array.from(document.querySelectorAll('.more-category-checkbox:checked')).map(cb => cb.value.toLowerCase());
+            const combinedCategories = [...new Set([...selectedCategories, ...selectedMoreCategories])];
+            document.getElementById('results').innerHTML = "";
+
+            markers.forEach(marker => {
+              const matchCategory = combinedCategories.length === 0 || marker.categories.some(cat => combinedCategories.includes(cat));
+              const matchName = marker.name.toLowerCase().includes(searchTerm);
+              if (matchCategory && matchName) {
+                marker.addTo(map);
+              } else {
+                map.removeLayer(marker);
+              }
+            });
+          }
+
+          document.getElementById('search').addEventListener('input', updateMarkers);
+          document.querySelectorAll('.filter-checkbox').forEach(cb => cb.addEventListener('change', updateMarkers));
+          document.addEventListener('change', (e) => {
+            if (e.target.classList.contains('more-category-checkbox')) {
+              updateMarkers();
+            }
+          });
+
+          updateMarkers();
+        })
+        .catch(error => {
+          console.error("Failed to load CSV:", error);
+        });
+    });
   </script>
-
-  <!-- OUTLINE NOTES FOR PROJECT REFERENCE
-
-  ✅ TECH STACK + HOSTING
-  - HTML, JS, and CSV-based dataset
-  - Using Netlify for deployment (Chromebook compatible)
-  - Firebase selected for contact form + possible saved lists later
-  - No backend server; client-side only
-
-  ✅ DATA STRUCTURE
-  - Master CSV file cleaned and merged
-  - Categories normalized for filtering (e.g., hiking, swimming, free camping)
-  - Using PapaParse for CSV-to-JSON conversion in-browser
-
-  ✅ UI DECISIONS
-  - Logo placed in top-left of header
-  - Filters stacked vertically (Chromebook viewport constraint)
-  - Category filter allows multi-select
-  - Search box placeholder = "Outside My Way"
-
-  ✅ CHROMEBOOK LIMITATIONS
-  - Cannot run local servers or heavy IDEs
-  - All edits must be done in GitHub web editor or ChatGPT canvas
-  - Images and CSV hosted via GitHub repo
-
-  ✅ TASKS IN PROGRESS
-  - [x] Set up Netlify serverless function to fetch RIDB API data
-  - [x] Securely store RIDB API key in Netlify environment variables
-  - [x] Implement interactive map using Leaflet.js
-  - [x] Connect front-end JS to call fetchRIDB API
-  - [x] Display results as map pins using FacilityLatitude + FacilityLongitude
-  - [x] Display filtered pins by category and keyword (RIDB only)
-  - [x] Add pin color legend and custom colors based on activity type
-  - [x] Add richer metadata to popups (address, directions link)
-  - [x] Load and parse CSV data with PapaParse (if needed)
-  - [ ] Finalize favicon + responsive tweaks
-
-  ✅ NEXT STEPS
-  - Allow CSV and RIDB pins to co-exist and share filter system ✅
-  - Improve mobile responsiveness of map and controls
-  - Add footer with GitHub + Contact link
-  - Add dedicated filter/view for Appalachian Trail dataset (future)
-
-  -->
 </body>
 </html>
 
