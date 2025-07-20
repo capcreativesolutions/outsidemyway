@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 exports.handler = async function(event, context) {
   // ✅ Hardcode the key for now — replace with your actual one
-  const RIDB_API_KEY = "45315405-be74-484f-8302-fb72ce14c6b7";
+  const RIDB_API_KEY = process.env.RIDB_API_KEY;
 
   console.log("RIDB_API_KEY:", RIDB_API_KEY ? "Received ✅" : "Missing ❌");
 
