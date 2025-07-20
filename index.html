@@ -79,6 +79,12 @@
       margin-bottom: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
+    #csv-uploader {
+      margin: 10px;
+      padding: 10px;
+      background: #f3f3f3;
+      border-top: 1px solid #ccc;
+    }
   </style>
 </head>
 <body>
@@ -110,8 +116,30 @@
   </div>
   <div id="results"></div>
 
+  <div id="csv-uploader">
+    <h3>CSV Upload for Admins Only</h3>
+    <input type="file" id="csvFile" accept=".csv" />
+    <button onclick="uploadCSV()">Upload CSV</button>
+    <p id="uploadStatus"></p>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBQE3U0lPxLlCF7qcDxo1Pd2qabCXUUtFw",
+      authDomain: "outsidemyway.firebaseapp.com",
+      projectId: "outsidemyway",
+      storageBucket: "outsidemyway.firebasestorage.app",
+      messagingSenderId: "696283600984",
+      appId: "1:696283600984:web:6d1c28e728b2a93108d22d"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     document.addEventListener("DOMContentLoaded", function () {
       const map = L.map('map').setView([31.9686, -99.9018], 6);
 
@@ -119,125 +147,74 @@
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
 
-      const markers = [];
-      const categories = new Set();
-      const categoryIcons = {};
-      const excludedCategories = new Set(["cultrual", "fire lookouts", "interpretive programs", "picnicking", "playground park specialized sport site", "visitor center", "wildlife viewing"]);
+      db.collection("locations").get().then((querySnapshot) => {
+        console.log("📍 Loaded location markers:");
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          console.log(doc.id, "=>", data);
 
-      const colorAssignments = {
-        "Free Camping": "gold",
-        "Camping": "red",
-        "Swimming Hole": "blue",
-        "Hiking": "green",
-        "Horseback Riding": "purple",
-        "Fishing": "orange"
-      };
+          if (data.lat && data.lng) {
+            const marker = L.marker([data.lat, data.lng]).addTo(map);
+            marker.bindPopup(`<b>${data.name}</b><br>${data.category || ''}`);
+          }
+        });
+      }).catch((error) => {
+        console.error("Error loading markers:", error);
+      });
+    });
 
-      function getIcon(category) {
-        const color = colorAssignments[category] || null;
-        if (!categoryIcons[category]) {
-          categoryIcons[category] = new L.Icon({
-            iconUrl: color
-              ? `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`
-              : 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-          });
-        }
-        return categoryIcons[category];
+    function uploadCSV() {
+      const fileInput = document.getElementById("csvFile");
+      const status = document.getElementById("uploadStatus");
+
+      if (!fileInput.files.length) {
+        status.textContent = "Please select a CSV file.";
+        return;
       }
 
-      fetch('locations.csv')
-        .then(response => response.text())
-        .then(csvText => {
-          const parsed = Papa.parse(csvText, {
-            header: true,
-            skipEmptyLines: true,
-          });
+      Papa.parse(fileInput.files[0], {
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          const rows = results.data;
+          let batch = db.batch();
+          let counter = 0;
 
-          parsed.data.forEach(row => {
-            const name = row.name || "Unnamed";
-            const lat = parseFloat(row.latitude);
-            const lon = parseFloat(row.longitude);
-            const categoryField = row.category || "Other";
-
-            if (!isNaN(lat) && !isNaN(lon)) {
-              const categoryList = categoryField.split(',').map(cat => cat.trim().toLowerCase());
-              const normalizedCategories = categoryList.map(cat => cat === "hike" ? "hiking" : cat);
-              const primaryCategory = normalizedCategories.includes("free camping") ? "Free Camping" : normalizedCategories[0].replace(/\b\w/g, c => c.toUpperCase());
-              const icon = getIcon(primaryCategory);
-
-              const marker = L.marker([lat, lon], { icon });
-              marker.name = name;
-              marker.categories = normalizedCategories;
-              marker.description = row.description || "";
-              marker.lat = lat;
-              marker.lon = lon;
-
-              marker.on('click', () => {
-                const resultDiv = document.getElementById('results');
-                resultDiv.innerHTML = `
-                  <div class="location-card">
-                    <strong>${marker.name}</strong><br>
-                    <em>${marker.categories.join(', ')}</em><br>
-                    <p>${marker.description}</p>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination=${marker.lat},${marker.lon}" target="_blank">Navigate with Google Maps</a>
-                  </div>
-                `;
+          rows.forEach((row, index) => {
+            if (row.lat && row.lng && row.name) {
+              const ref = db.collection("locations").doc();
+              batch.set(ref, {
+                name: row.name,
+                lat: parseFloat(row.lat),
+                lng: parseFloat(row.lng),
+                category: row.category || "General",
+                features: row.features || "",
+                state: row.state || "",
+                cost: row.cost || "",
+                notes: row.notes || "",
+                source: row.source || "",
+                phone: row.phone || "",
+                url: row.url || "",
+                directions: row.directions || ""
               });
+              counter++;
+            }
 
-              markers.push(marker);
-              marker.categories.forEach(cat => {
-                if (!excludedCategories.has(cat)) {
-                  categories.add(cat);
-                }
+            if ((index + 1) % 50 === 0 || index === rows.length - 1) {
+              batch.commit().then(() => {
+                console.log(`Committed ${counter} locations.`);
+                status.textContent = `Upload complete: ${counter} locations added.`;
+              }).catch(error => {
+                console.error("Upload failed:", error);
+                status.textContent = "Upload failed. See console for details.";
               });
+              batch = db.batch();
+              counter = 0;
             }
           });
-
-          const moreCategoriesDiv = document.getElementById('moreCategories');
-          Array.from(categories).sort().forEach(cat => {
-            const label = document.createElement('label');
-            label.innerHTML = `<input type="checkbox" class="more-category-checkbox" value="${cat}"> ${cat.charAt(0).toUpperCase() + cat.slice(1)}`;
-            moreCategoriesDiv.appendChild(label);
-          });
-
-          function updateMarkers() {
-            const searchTerm = document.getElementById('search').value.toLowerCase();
-            const selectedCategories = Array.from(document.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value.toLowerCase());
-            const selectedMoreCategories = Array.from(document.querySelectorAll('.more-category-checkbox:checked')).map(cb => cb.value.toLowerCase());
-            const combinedCategories = [...new Set([...selectedCategories, ...selectedMoreCategories])];
-            document.getElementById('results').innerHTML = "";
-
-            markers.forEach(marker => {
-              const matchCategory = combinedCategories.length === 0 || marker.categories.some(cat => combinedCategories.includes(cat));
-              const matchName = marker.name.toLowerCase().includes(searchTerm);
-              if (matchCategory && matchName) {
-                marker.addTo(map);
-              } else {
-                map.removeLayer(marker);
-              }
-            });
-          }
-
-          document.getElementById('search').addEventListener('input', updateMarkers);
-          document.querySelectorAll('.filter-checkbox').forEach(cb => cb.addEventListener('change', updateMarkers));
-          document.addEventListener('change', (e) => {
-            if (e.target.classList.contains('more-category-checkbox')) {
-              updateMarkers();
-            }
-          });
-
-          updateMarkers();
-        })
-        .catch(error => {
-          console.error("Failed to load CSV:", error);
-        });
-    });
+        }
+      });
+    }
   </script>
 </body>
 </html>
-
