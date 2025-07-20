@@ -12,6 +12,8 @@ TASKS IN PROGRESS:
 - Normalized tag filtering (handles comma-separated values correctly) ✅
 - Filtering by name (case-insensitive substring match) ✅
 - Fuzzy filtering logic (e.g., 'hike' matches 'hiking') ✅
+- RIDB markers temporarily styled in purple for visual verification ✅
+- Clear Filters button added ✅
 
 TO DO NEXT:
 - Restore persistent result pane if user requests it
@@ -78,6 +80,14 @@ TO DO NEXT:
       display: block;
       margin-top: 5px;
     }
+    #clearFilters {
+      margin-top: 10px;
+      padding: 5px 10px;
+      background-color: #2e5e34;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -96,6 +106,7 @@ TO DO NEXT:
       <div id="moreFilters"></div>
       <div class="search-bar">
         <input type="text" id="searchBox" placeholder="Search name..." />
+        <button id="clearFilters">Clear Filters</button>
       </div>
     </div>
   </div>
@@ -118,7 +129,8 @@ TO DO NEXT:
       return tagString.split(',').map(tag => tag.trim().toLowerCase()).filter(Boolean);
     }
 
-    function colorFromCategory(tags) {
+    function colorFromCategory(tags, isRIDB = false) {
+      if (isRIDB) return "purple"; // temporary color override for RIDB testing
       const t = tags.join(',').toLowerCase();
       if (t.includes("free")) return "gold";
       if (t.includes("camping")) return "green";
@@ -126,7 +138,7 @@ TO DO NEXT:
       return "crimson";
     }
 
-    function addMarker(d) {
+    function addMarker(d, isRIDB = false) {
       const lat = parseFloat(d.latitude || d.FacilityLatitude);
       const lon = parseFloat(d.longitude || d.FacilityLongitude);
       if (!lat || !lon) return;
@@ -135,7 +147,7 @@ TO DO NEXT:
       const desc = d.description || d.FacilityDescription || "";
       const rawTags = d.category || d.FacilityKeywords || "";
       const tags = normalizeTags(rawTags);
-      const color = colorFromCategory(tags);
+      const color = colorFromCategory(tags, isRIDB);
 
       tags.forEach(t => uniqueTags.add(t));
 
@@ -177,9 +189,10 @@ TO DO NEXT:
     function addDynamicFilters() {
       const container = document.getElementById("moreFilters");
       Array.from(uniqueTags).sort().forEach(tag => {
-        if (["cultural", "visitor center", "interpretive programs", "picnicking", "specialized sport site", "playground park", "fire lookouts"].includes(tag)) return;
+        const t = tag.trim().toLowerCase();
+        if (["cultural", "visitor center", "interpretive programs", "picnicking", "specialized sport site", "playground park", "fire lookouts"].includes(t)) return;
         const label = document.createElement("label");
-        label.innerHTML = `<input type="checkbox" class="filter" value="${tag}"> ${tag.charAt(0).toUpperCase() + tag.slice(1)}`;
+        label.innerHTML = `<input type="checkbox" class="filter" value="${t}"> ${t.charAt(0).toUpperCase() + t.slice(1)}`;
         container.appendChild(label);
       });
     }
@@ -187,11 +200,11 @@ TO DO NEXT:
     async function init() {
       const csv = await fetch("locations.csv").then(r => r.text());
       const { data } = Papa.parse(csv, { header: true });
-      data.forEach(addMarker);
+      data.forEach(d => addMarker(d, false));
 
       try {
         const ridb = await fetch("/.netlify/functions/fetchRIDB").then(r => r.json());
-        (ridb.RECDATA || []).forEach(addMarker);
+        (ridb.RECDATA || []).forEach(d => addMarker(d, true));
       } catch (e) {
         console.warn("RIDB fetch failed", e);
       }
@@ -199,9 +212,15 @@ TO DO NEXT:
       addDynamicFilters();
       document.querySelectorAll('.filter').forEach(cb => cb.addEventListener("change", applyFilters));
       document.getElementById("searchBox").addEventListener("input", applyFilters);
+      document.getElementById("clearFilters").addEventListener("click", () => {
+        document.querySelectorAll(".filter").forEach(cb => cb.checked = false);
+        document.getElementById("searchBox").value = "";
+        applyFilters();
+      });
     }
 
     init();
   </script>
 </body>
 </html>
+
