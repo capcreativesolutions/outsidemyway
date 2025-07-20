@@ -11,6 +11,7 @@ TASKS IN PROGRESS:
 - Popup display method preferred over bottom pane ✅
 - Normalized tag filtering (handles comma-separated values correctly) ✅
 - Filtering by name (case-insensitive substring match) ✅
+- Fuzzy filtering logic (e.g., 'hike' matches 'hiking') ✅
 
 TO DO NEXT:
 - Restore persistent result pane if user requests it
@@ -18,7 +19,6 @@ TO DO NEXT:
 - Optional toggle between RIDB-only, CSV-only, or combined view
 - Create lightweight filter manager to reduce tag clutter
 - Add 'Appalachian Trail' as a new dedicated data layer once provided
-
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -162,9 +162,11 @@ TO DO NEXT:
       const selected = Array.from(checkboxes).map(cb => cb.value.toLowerCase());
 
       markers.forEach(m => {
-        const matches = selected.length === 0 || selected.some(tag => m.tags.includes(tag));
+        const tagMatch = selected.length === 0 || selected.some(filterTag =>
+          m.tags.some(markerTag => markerTag.includes(filterTag) || filterTag.includes(markerTag))
+        );
         const nameMatch = m.name.includes(query);
-        if (matches && nameMatch) {
+        if (tagMatch && nameMatch) {
           map.addLayer(m);
         } else {
           map.removeLayer(m);
@@ -187,8 +189,12 @@ TO DO NEXT:
       const { data } = Papa.parse(csv, { header: true });
       data.forEach(addMarker);
 
-      const ridb = await fetch("/.netlify/functions/fetchRIDB").then(r => r.json());
-      (ridb.RECDATA || []).forEach(addMarker);
+      try {
+        const ridb = await fetch("/.netlify/functions/fetchRIDB").then(r => r.json());
+        (ridb.RECDATA || []).forEach(addMarker);
+      } catch (e) {
+        console.warn("RIDB fetch failed", e);
+      }
 
       addDynamicFilters();
       document.querySelectorAll('.filter').forEach(cb => cb.addEventListener("change", applyFilters));
@@ -199,4 +205,3 @@ TO DO NEXT:
   </script>
 </body>
 </html>
-
