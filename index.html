@@ -187,7 +187,12 @@
                 name: row.name,
                 lat: parseFloat(row.lat),
                 lng: parseFloat(row.lng),
-                category: row.category || "General"
+                category: row.category || "General",
+                features: row.features || "",
+                state: row.state || "",
+                cost: row.cost || "",
+                notes: row.notes || "",
+                source: row.source || ""
               });
               counter++;
             }
