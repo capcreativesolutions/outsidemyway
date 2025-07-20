@@ -1,0 +1,8 @@
+[build]
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[context.production.environment]
+  RIDB_API_KEY = "b1eabf84-93ba-403f-be0f-2ba0e26fbb94"
