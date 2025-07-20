@@ -1,9 +1,9 @@
 const fetch = require('node-fetch');
 
 exports.handler = async function(event, context) {
-  const apiKey = "45315405-be74-484f-8302-fb72ce14c6b7";
-  
-  // ✅ DEBUG OUTPUT — this goes to the Netlify logs
+  // ✅ Hardcode the key for now — replace with your actual one
+  const RIDB_API_KEY = "45315405-be74-484f-8302-fb72ce14c6b7";
+
   console.log("RIDB_API_KEY:", RIDB_API_KEY ? "Received ✅" : "Missing ❌");
 
   const RIDB_ENDPOINT = 'https://ridb.recreation.gov/api/v1/facilities?limit=10';
@@ -22,7 +22,7 @@ exports.handler = async function(event, context) {
     const data = await response.json();
     return {
       statusCode: 200,
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     };
   } catch (err) {
     return {
