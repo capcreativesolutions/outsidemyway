@@ -5,4 +5,4 @@
   node_bundler = "esbuild"
 
 [context.production.environment]
-  RIDB_API_KEY = "b1eabf84-93ba-403f-be0f-2ba0e26fbb94"
+  RIDB_API_KEY = "ab41ea71-e6d3-42b2-881a-bc652f9f2824"
