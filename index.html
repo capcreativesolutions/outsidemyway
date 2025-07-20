@@ -1,3 +1,25 @@
+<!--
+PROJECT NOTES (DO NOT DELETE)
+
+TASKS IN PROGRESS:
+- Front-end integration of RIDB API and local CSV data ✅
+- Dynamic filters from category tags ✅
+- Color-coded pins for: Free Camping (gold), Camping (green), Hiking (blue), Other (crimson) ✅
+- Google Maps directions links in popups ✅
+- Category filters auto-generated from both RIDB + CSV ✅
+- Suppression of irrelevant RIDB tags (e.g., "Cultural", "Interpretive Programs") ✅
+- Popup display method preferred over bottom pane ✅
+- Normalized tag filtering (handles comma-separated values correctly) ✅
+- Filtering by name (case-insensitive substring match) ✅
+
+TO DO NEXT:
+- Restore persistent result pane if user requests it
+- Implement loading indicator or error message for RIDB failure
+- Optional toggle between RIDB-only, CSV-only, or combined view
+- Create lightweight filter manager to reduce tag clutter
+- Add 'Appalachian Trail' as a new dedicated data layer once provided
+
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -153,7 +175,7 @@
     function addDynamicFilters() {
       const container = document.getElementById("moreFilters");
       Array.from(uniqueTags).sort().forEach(tag => {
-        if (["free camping", "camping", "hiking", "swimming hole", "cultural", "visitor center", "interpretive programs", "picnicking", "specialized sport site", "playground park", "fire lookouts"].includes(tag)) return;
+        if (["cultural", "visitor center", "interpretive programs", "picnicking", "specialized sport site", "playground park", "fire lookouts"].includes(tag)) return;
         const label = document.createElement("label");
         label.innerHTML = `<input type="checkbox" class="filter" value="${tag}"> ${tag.charAt(0).toUpperCase() + tag.slice(1)}`;
         container.appendChild(label);
@@ -177,5 +199,4 @@
   </script>
 </body>
 </html>
-
 
