@@ -62,56 +62,38 @@
     .cta-button:hover {
       background-color: #6b594a;
     }
-    .section {
-      padding: 4rem 2rem;
+    .why-section {
+      background: url('/images/topo-lines-light.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      padding: 3rem 2rem;
       text-align: center;
     }
-    .section h2 {
+    .why-section h2 {
       font-size: 2rem;
       margin-bottom: 1rem;
+      color: #2e2e2e;
     }
-    .features {
+    .why-boxes {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 2rem;
-      background-image: url('/images/topo-lines-light.png');
-      background-size: contain;
-      background-repeat: repeat;
-      padding: 2rem;
-      border-radius: 12px;
     }
-    .feature-box {
+    .why-box {
       background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
       padding: 1.5rem;
-      border-radius: 8px;
       max-width: 300px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
-    .feature-box h3 {
+    .why-box h3 {
       margin-top: 0;
     }
-    .contact-form {
-      max-width: 400px;
-      margin: 2rem auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .contact-form input[type="email"] {
-      padding: 0.75rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 1rem;
-    }
-    .contact-form button {
-      background-color: #594a42;
-      color: #fff;
-      padding: 0.75rem;
-      border: none;
-      border-radius: 6px;
-      font-size: 1rem;
-      cursor: pointer;
+    .feature-img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin: 2rem 0;
     }
     footer {
       text-align: center;
@@ -137,36 +119,23 @@
     <img src="/images/trek4free-hero.png" alt="Hero Image with Topo character">
   </section>
 
-  <section class="section">
+  <section class="why-section">
     <h2>Why Trek4Free?</h2>
-    <div class="features">
-      <div class="feature-box">
-        <h3>One Map, Many Adventures</h3>
-        <p>Stop bouncing between tabs. We combine campsites, trails, and route planning all in one place.</p>
+    <div class="why-boxes">
+      <div class="why-box">
+        <h3>Save Money</h3>
+        <p>Skip expensive campgrounds. Use our database to find free, legal places to stay near the action.</p>
       </div>
-      <div class="feature-box">
-        <h3>Budget-Friendly Travel</h3>
-        <p>Discover free or low-cost camping options near your destination. Save money, go further.</p>
+      <div class="why-box">
+        <h3>Plan Smarter</h3>
+        <p>Our map integrates trails, paddling, climbing and more — all linked to nearby free options.</p>
       </div>
-      <div class="feature-box">
-        <h3>Curated for Adventure</h3>
-        <p>We prioritize the wild stuff — climbing crags, paddling launches, hike-in camps, and biking loops.</p>
+      <div class="why-box">
+        <h3>Go Farther</h3>
+        <p>Fuel your weekend with fewer logistics. Less time planning = more time outdoors.</p>
       </div>
     </div>
-  </section>
-
-  <section class="section">
-    <h2>How It Works</h2>
-    <p>Search for your activity or area → Filter results → Find free camping → Plan the trip of a lifetime</p>
-  </section>
-
-  <section class="section">
-    <h2>Stay in the Loop</h2>
-    <p>Sign up for beta updates, free gear guides, and upcoming features.</p>
-    <form class="contact-form">
-      <input type="email" placeholder="Enter your email" required>
-      <button type="submit">Subscribe</button>
-    </form>
+    <img src="/images/waterfall.png" alt="Topo Character at Waterfall" class="feature-img">
   </section>
 
   <footer>
