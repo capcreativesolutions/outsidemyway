@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Trek4Free | Adventure Starts Here</title>
   <meta name="description" content="Find free camping near your next outdoor adventure. Trek4Free helps you discover trails, climbing, paddling, and biking routes with free places to stay nearby." />
+  <meta property="og:title" content="Trek4Free | Plan Your Adventure for Free" />
+  <meta property="og:description" content="Free camping near trails, climbing, paddling, and biking. Plan smarter, travel cheaper, and explore more with Trek4Free." />
+  <meta property="og:image" content="/images/trek4free-hero.png" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" />
   <style>
     body {
@@ -24,12 +27,24 @@
     header img {
       height: 50px;
     }
+    nav a.cta-button {
+      background-color: #8e735b;
+      color: #fff;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+    nav a.cta-button:hover {
+      background-color: #6b594a;
+    }
     .hero {
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      padding: 4rem 2rem;
+      padding: 4rem 2rem 2rem;
     }
     .hero h1 {
       font-size: 3rem;
@@ -48,18 +63,47 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       margin-top: 2rem;
     }
-    .cta-button {
+    section {
+      padding: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .section-title {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #3c3c3c;
+      text-align: center;
+    }
+    .features, .how-it-works {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: space-around;
+    }
+    .feature-box {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      flex: 1 1 250px;
+      text-align: center;
+    }
+    .cta-section {
+      text-align: center;
+      padding: 3rem 2rem;
+      background-color: #eee4db;
+    }
+    .cta-button-large {
       background-color: #8e735b;
       color: #fff;
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 1rem 2rem;
+      border-radius: 8px;
       text-decoration: none;
+      display: inline-block;
       transition: background 0.3s;
     }
-    .cta-button:hover {
+    .cta-button-large:hover {
       background-color: #6b594a;
     }
     footer {
@@ -83,7 +127,49 @@
     <h1>Find Adventure. Sleep Free.</h1>
     <p>Discover epic trails, hidden swimming holes, thrilling climbs, and paddling access points — all with nearby free places to stay. Trek4Free helps you plan smarter, travel cheaper, and explore more.</p>
     <a href="https://clinquant-biscochitos-75de17.netlify.app/explore.html" class="cta-button">Start Exploring</a>
-    <img src="/images/trek4free-hero.png" alt="Hero Image with Topo character">
+    <img src="/images/trek4free-hero.png" alt="Topo character in the wild">
+  </section>
+
+  <section>
+    <h2 class="section-title">Why Trek4Free?</h2>
+    <div class="features">
+      <div class="feature-box">
+        <h3>Free Campsites</h3>
+        <p>Verified locations to sleep without fees — from national forests to Walmarts.</p>
+      </div>
+      <div class="feature-box">
+        <h3>Adventure-First Planning</h3>
+        <p>Search by hike, climb, paddle, or ride — and we show you nearby campsites.</p>
+      </div>
+      <div class="feature-box">
+        <h3>Curated & Crowd-Sourced</h3>
+        <p>Our listings grow daily, enhanced by real travelers and smart AI tools.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">How It Works</h2>
+    <div class="how-it-works">
+      <div class="feature-box">
+        <h3>1. Choose Your Activity</h3>
+        <p>Select hiking, biking, climbing, paddling — or all of them.</p>
+      </div>
+      <div class="feature-box">
+        <h3>2. Filter for Free Campsites</h3>
+        <p>Use our map to find free places to sleep nearby your destination.</p>
+      </div>
+      <div class="feature-box">
+        <h3>3. Pack + Go</h3>
+        <p>With local tips, weather, and trail details — we’ve got you ready.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <h2>Stop bouncing between apps.</h2>
+    <p>Adventure + Camping + Route Planning — all in one map. Built for the bold.</p>
+    <a href="https://clinquant-biscochitos-75de17.netlify.app/explore.html" class="cta-button-large">Explore the Map</a>
   </section>
 
   <footer>
@@ -91,3 +177,4 @@
   </footer>
 </body>
 </html>
+
