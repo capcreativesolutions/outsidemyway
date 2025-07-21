@@ -106,11 +106,7 @@
         <div class="checkbox-list" id="moreCategories"></div>
       </div>
     </div>
-    <div id="map">
-      <div id="search-container">
-        <input type="text" id="search" placeholder="Search name...">
-      </div>
-    </div>
+    <div id="map"></div>
   </div>
   <div id="results"></div>
   <div id="csv-uploader">
@@ -123,10 +119,27 @@
     <button onclick="fetchRIDBSample()">Fetch RIDB Sample</button>
     <p id="uploadStatus"></p>
   </div>
+
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const map = L.map('map').setView([37.8, -96], 4);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
     const categoryMap = {
       "Hike": "Hiking",
       "Hiking": "Hiking",
@@ -137,20 +150,34 @@
     };
 
     const unwantedCategories = ["Fire Tower", "Cultural Site", "Specialized Sport Site"];
+    const markers = [];
 
-    const validCategories = Object.values(categoryMap).filter((v, i, self) => v && self.indexOf(v) === i);
-    const filterContainer = document.getElementById('popularFilters');
+    function addMarker(data) {
+      const lat = data.latitude;
+      const lng = data.longitude;
+      const name = data.name;
+      const category = categoryMap[data.category] || data.category;
 
-    validCategories.forEach(cat => {
-      const label = document.createElement('label');
-      label.innerHTML = `<input type="checkbox" class="filter-checkbox" value="${cat}" onchange="filterMapPins()"> ${cat}`;
-      filterContainer.appendChild(label);
-    });
+      if (!lat || !lng || unwantedCategories.includes(category)) return;
+
+      const marker = L.marker([lat, lng]).addTo(map);
+      marker.category = category;
+      marker.bindPopup(`<strong>${name}</strong><br>${category}`);
+      markers.push(marker);
+    }
+
+    function fetchFirebaseData() {
+      db.collection("locations").get().then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          addMarker(doc.data());
+        });
+      });
+    }
 
     function filterMapPins() {
       const selectedCategories = Array.from(document.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value);
       markers.forEach(marker => {
-        const cat = categoryMap[marker.category] || marker.category;
+        const cat = marker.category;
         if (selectedCategories.length === 0 || selectedCategories.includes(cat)) {
           marker.addTo(map);
         } else {
@@ -159,10 +186,18 @@
       });
     }
 
-    function updateMarkerPopup(marker, data) {
-      const popupContent = `<strong>${data.name}</strong><br>${data.category}<br>${data.notes || ''}`;
-      marker.bindPopup(popupContent);
+    function populateFilters() {
+      const filterContainer = document.getElementById('popularFilters');
+      const uniqueCats = [...new Set(Object.values(categoryMap))];
+      uniqueCats.forEach(cat => {
+        const label = document.createElement('label');
+        label.innerHTML = `<input type="checkbox" class="filter-checkbox" value="${cat}" onchange="filterMapPins()"> ${cat}`;
+        filterContainer.appendChild(label);
+      });
     }
+
+    populateFilters();
+    fetchFirebaseData();
   </script>
 </body>
 </html>
