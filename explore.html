@@ -127,6 +127,13 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
+    const map = L.map('map').setView([37.8, -96], 4);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+    }).addTo(map);
+
+    let markers = [];
+
     const categoryMap = {
       "Hike": "Hiking",
       "Hiking": "Hiking",
@@ -150,7 +157,7 @@
     function filterMapPins() {
       const selectedCategories = Array.from(document.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value);
       markers.forEach(marker => {
-        const cat = categoryMap[marker.category] || marker.category;
+        const cat = categoryMap[marker.options.category] || marker.options.category;
         if (selectedCategories.length === 0 || selectedCategories.includes(cat)) {
           marker.addTo(map);
         } else {
@@ -163,6 +170,30 @@
       const popupContent = `<strong>${data.name}</strong><br>${data.category}<br>${data.notes || ''}`;
       marker.bindPopup(popupContent);
     }
+
+    async function fetchData() {
+      const response = await fetch('locations.json');
+      const data = await response.json();
+
+      data.forEach(loc => {
+        if (unwantedCategories.includes(loc.category)) return;
+        const cat = categoryMap[loc.category] || loc.category;
+        const marker = L.circleMarker([loc.lat, loc.lon], {
+          radius: 8,
+          fillColor: "green",
+          color: "#000",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8,
+          category: cat
+        });
+        marker.bindPopup(`<strong>${loc.name}</strong><br>${cat}`);
+        marker.addTo(map);
+        markers.push(marker);
+      });
+    }
+
+    fetchData();
   </script>
 </body>
 </html>
