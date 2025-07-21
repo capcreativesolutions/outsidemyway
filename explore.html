@@ -103,7 +103,14 @@
       </div>
       <div class="filter-group">
         <h3>More Categories</h3>
-        <div class="checkbox-list" id="moreCategories"></div>
+        <div class="checkbox-list" id="moreCategories">
+          <label><input type="checkbox" class="more-filter-checkbox" value="Dog Friendly" onchange="filterMapPins()"> Dog Friendly</label>
+          <label><input type="checkbox" class="more-filter-checkbox" value="Mountain Biking" onchange="filterMapPins()"> Mountain Biking</label>
+          <label><input type="checkbox" class="more-filter-checkbox" value="Rock Climbing" onchange="filterMapPins()"> Rock Climbing</label>
+          <label><input type="checkbox" class="more-filter-checkbox" value="Hiking - Easy" onchange="filterMapPins()"> Hiking - Easy</label>
+          <label><input type="checkbox" class="more-filter-checkbox" value="Hiking - Moderate" onchange="filterMapPins()"> Hiking - Moderate</label>
+          <label><input type="checkbox" class="more-filter-checkbox" value="Hiking - Hard" onchange="filterMapPins()"> Hiking - Hard</label>
+        </div>
       </div>
     </div>
     <div id="map">
@@ -155,10 +162,13 @@
     });
 
     function filterMapPins() {
-      const selectedCategories = Array.from(document.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value);
+      const selectedPopular = Array.from(document.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value);
+      const selectedMore = Array.from(document.querySelectorAll('.more-filter-checkbox:checked')).map(cb => cb.value);
+      const allSelected = selectedPopular.concat(selectedMore);
+
       markers.forEach(marker => {
         const cat = categoryMap[marker.options.category] || marker.options.category;
-        if (selectedCategories.length === 0 || selectedCategories.includes(cat)) {
+        if (allSelected.length === 0 || allSelected.includes(cat)) {
           marker.addTo(map);
         } else {
           map.removeLayer(marker);
@@ -174,20 +184,25 @@
     async function fetchData() {
       const response = await fetch('locations.json');
       const data = await response.json();
+      const resultsContainer = document.getElementById('results');
+      resultsContainer.innerHTML = '';
 
       data.forEach(loc => {
         if (unwantedCategories.includes(loc.category)) return;
         const cat = categoryMap[loc.category] || loc.category;
+        const color = cat === 'Hiking' ? 'green' : cat === 'Free Camping' ? 'blue' : cat === 'Swimming Hole' ? 'aqua' : 'gray';
         const marker = L.circleMarker([loc.lat, loc.lon], {
           radius: 8,
-          fillColor: "green",
+          fillColor: color,
           color: "#000",
           weight: 1,
           opacity: 1,
           fillOpacity: 0.8,
           category: cat
         });
-        marker.bindPopup(`<strong>${loc.name}</strong><br>${cat}`);
+        marker.on('click', () => {
+          resultsContainer.innerHTML = `<div class='location-card'><h4>${loc.name}</h4><p><strong>Category:</strong> ${cat}</p><p>${loc.notes || 'No description available.'}</p></div>`;
+        });
         marker.addTo(map);
         markers.push(marker);
       });
