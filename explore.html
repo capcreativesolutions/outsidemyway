@@ -3,30 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Outside My Way</title>
+  <title>Trek4Free Map Explorer</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
       flex-direction: column;
     }
     header {
       display: flex;
       align-items: center;
-      background-color: #2f6132;
-      padding: 10px;
+      background-color: #264d28;
+      padding: 12px 20px;
       color: white;
       z-index: 1001;
     }
     header img {
-      height: 40px;
-      margin-right: 10px;
+      height: 50px;
+      margin-right: 15px;
     }
     header h1 {
-      font-size: 1.5em;
+      font-size: 1.8em;
       margin: 0;
     }
     #main {
@@ -36,9 +36,9 @@
     #filters {
       display: flex;
       flex-direction: column;
-      padding: 10px;
-      width: 250px;
-      background: #f0f0f0;
+      padding: 12px;
+      width: 260px;
+      background: #f8f8f8;
       border-right: 1px solid #ccc;
       z-index: 1000;
     }
@@ -50,7 +50,7 @@
     }
     .checkbox-list label {
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
     }
     #map {
       height: 70vh;
@@ -82,18 +82,18 @@
       margin-bottom: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    #csv-uploader {
-      margin: 10px;
+    #legend {
       padding: 10px;
-      background: #f3f3f3;
+      font-size: 0.9em;
+      background: #fff;
       border-top: 1px solid #ccc;
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="logo.png" alt="Outside My Way logo">
-    <h1>Outside My Way</h1>
+    <img src="logo.png" alt="Trek4Free logo">
+    <h1>Trek4Free Explorer</h1>
   </header>
   <div id="main">
     <div id="filters">
@@ -120,15 +120,8 @@
     </div>
   </div>
   <div id="results"></div>
-  <div id="csv-uploader">
-    <h3>CSV Upload for Admins Only</h3>
-    <input type="file" id="csvFile" accept=".csv" />
-    <button onclick="uploadCSV()">Upload CSV</button>
-    <br><br>
-    <label for="ridbKey">RIDB API Key:</label>
-    <input type="text" id="ridbKey" placeholder="Enter your RIDB API key" style="width: 300px;">
-    <button onclick="fetchRIDBSample()">Fetch RIDB Sample</button>
-    <p id="uploadStatus"></p>
+  <div id="legend">
+    <strong>Map Legend:</strong> 🟢 Hiking | 🔵 Free Camping | 🔷 Swimming Hole | ⚪ Other
   </div>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -140,7 +133,6 @@
     }).addTo(map);
 
     let markers = [];
-
     const categoryMap = {
       "Hike": "Hiking",
       "Hiking": "Hiking",
@@ -149,9 +141,7 @@
       "Camping": "Camping",
       "Swimming Hole": "Swimming Hole"
     };
-
     const unwantedCategories = ["Fire Tower", "Cultural Site", "Specialized Sport Site"];
-
     const validCategories = Object.values(categoryMap).filter((v, i, self) => v && self.indexOf(v) === i);
     const filterContainer = document.getElementById('popularFilters');
 
@@ -165,10 +155,11 @@
       const selectedPopular = Array.from(document.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value);
       const selectedMore = Array.from(document.querySelectorAll('.more-filter-checkbox:checked')).map(cb => cb.value);
       const allSelected = selectedPopular.concat(selectedMore);
-
       markers.forEach(marker => {
         const cat = categoryMap[marker.options.category] || marker.options.category;
-        if (allSelected.length === 0 || allSelected.includes(cat)) {
+        if (allSelected.length === 0) {
+          map.removeLayer(marker);
+        } else if (allSelected.includes(cat)) {
           marker.addTo(map);
         } else {
           map.removeLayer(marker);
@@ -186,7 +177,6 @@
       const data = await response.json();
       const resultsContainer = document.getElementById('results');
       resultsContainer.innerHTML = '';
-
       data.forEach(loc => {
         if (unwantedCategories.includes(loc.category)) return;
         const cat = categoryMap[loc.category] || loc.category;
@@ -203,7 +193,6 @@
         marker.on('click', () => {
           resultsContainer.innerHTML = `<div class='location-card'><h4>${loc.name}</h4><p><strong>Category:</strong> ${cat}</p><p>${loc.notes || 'No description available.'}</p></div>`;
         });
-        marker.addTo(map);
         markers.push(marker);
       });
     }
@@ -212,4 +201,3 @@
   </script>
 </body>
 </html>
-
