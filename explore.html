@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Outside My Way</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      background-color: #2f6132;
+      padding: 10px;
+      color: white;
+      z-index: 1001;
+    }
+    header img {
+      height: 40px;
+      margin-right: 10px;
+    }
+    header h1 {
+      font-size: 1.5em;
+      margin: 0;
+    }
+    #main {
+      display: flex;
+      flex-direction: row;
+    }
+    #filters {
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      width: 250px;
+      background: #f0f0f0;
+      border-right: 1px solid #ccc;
+      z-index: 1000;
+    }
+    .filter-group {
+      margin-bottom: 20px;
+    }
+    .filter-group h3 {
+      margin-bottom: 10px;
+    }
+    .checkbox-list label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    #map {
+      height: 70vh;
+      flex-grow: 1;
+      position: relative;
+      z-index: 1;
+    }
+    #search-container {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+    #results {
+      padding: 10px;
+      background: #f9f9f9;
+      height: 30vh;
+      overflow-y: auto;
+    }
+    .location-card {
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    #csv-uploader {
+      margin: 10px;
+      padding: 10px;
+      background: #f3f3f3;
+      border-top: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="logo.png" alt="Outside My Way logo">
+    <h1>Outside My Way</h1>
+  </header>
+  <div id="main">
+    <div id="filters">
+      <div class="filter-group">
+        <h3>Popular Filters</h3>
+        <div class="checkbox-list" id="popularFilters"></div>
+      </div>
+      <div class="filter-group">
+        <h3>More Categories</h3>
+        <div class="checkbox-list" id="moreCategories"></div>
+      </div>
+    </div>
+    <div id="map">
+      <div id="search-container">
+        <input type="text" id="search" placeholder="Search name...">
+      </div>
+    </div>
+  </div>
+  <div id="results"></div>
+  <div id="csv-uploader">
+    <h3>CSV Upload for Admins Only</h3>
+    <input type="file" id="csvFile" accept=".csv" />
+    <button onclick="uploadCSV()">Upload CSV</button>
+    <br><br>
+    <label for="ridbKey">RIDB API Key:</label>
+    <input type="text" id="ridbKey" placeholder="Enter your RIDB API key" style="width: 300px;">
+    <button onclick="fetchRIDBSample()">Fetch RIDB Sample</button>
+    <p id="uploadStatus"></p>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const categoryMap = {
+      "Hike": "Hiking",
+      "Hiking": "Hiking",
+      "Trail": "Hiking",
+      "Free Camping": "Free Camping",
+      "Camping": "Camping",
+      "Swimming Hole": "Swimming Hole"
+    };
+
+    const unwantedCategories = ["Fire Tower", "Cultural Site", "Specialized Sport Site"];
+
+    const validCategories = Object.values(categoryMap).filter((v, i, self) => v && self.indexOf(v) === i);
+    const filterContainer = document.getElementById('popularFilters');
+
+    validCategories.forEach(cat => {
+      const label = document.createElement('label');
+      label.innerHTML = `<input type="checkbox" class="filter-checkbox" value="${cat}" onchange="filterMapPins()"> ${cat}`;
+      filterContainer.appendChild(label);
+    });
+
+    function filterMapPins() {
+      const selectedCategories = Array.from(document.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value);
+      markers.forEach(marker => {
+        const cat = categoryMap[marker.category] || marker.category;
+        if (selectedCategories.length === 0 || selectedCategories.includes(cat)) {
+          marker.addTo(map);
+        } else {
+          map.removeLayer(marker);
+        }
+      });
+    }
+
+    function updateMarkerPopup(marker, data) {
+      const popupContent = `<strong>${data.name}</strong><br>${data.category}<br>${data.notes || ''}`;
+      marker.bindPopup(popupContent);
+    }
+  </script>
+</body>
+</html>
