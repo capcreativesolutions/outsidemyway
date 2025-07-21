@@ -4,13 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Trail Notes | Trek4Free</title>
+  <meta name="description" content="Trek4Free Trail Notes brings you curated hikes, AI-generated trail content, and real-time trip planning tools for adventurers." />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" />
   <style>
     body {
       margin: 0;
       font-family: 'Raleway', sans-serif;
-      background: #f4f4f4;
-      color: #2e2e2e;
+      background: #f6f4f0;
+      color: #333;
     }
     header {
       background-color: #594a42;
@@ -21,59 +22,84 @@
       align-items: center;
     }
     header a {
-      color: #fff;
+      color: white;
       text-decoration: none;
-      margin-left: 1rem;
+      font-weight: bold;
     }
     main {
       padding: 2rem;
+      max-width: 960px;
+      margin: auto;
     }
     h1 {
       font-size: 2.5rem;
       margin-bottom: 1rem;
+      color: #2e2e2e;
     }
     p {
       font-size: 1.1rem;
-      max-width: 800px;
+      line-height: 1.6;
     }
-    .highlight-box {
-      background-color: #fff;
-      padding: 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    .trail-highlight {
+      padding: 3rem 2rem;
+      text-align: center;
+      background-color: #fdfaf7;
+      border-top: 2px solid #ccc;
+      border-bottom: 2px solid #ccc;
+    }
+    .trail-highlight img {
+      max-width: 100%;
+      height: auto;
+      margin: 2rem 0;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .trail-highlight .cta-button {
+      background-color: #8e735b;
+      color: #fff;
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 1rem;
+    }
+    .trail-highlight .cta-button:hover {
+      background-color: #6b594a;
+    }
+    footer {
+      background-color: #eee4db;
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #555;
       margin-top: 2rem;
     }
   </style>
 </head>
 <body>
   <header>
-    <h2>Trek4Free</h2>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="explore.html">Explore the Map</a>
-    </nav>
+    <a href="index.html">&larr; Back to Trek4Free</a>
+    <span>Trail Notes</span>
   </header>
 
   <main>
-    <h1>Trail Notes</h1>
-    <p>Real-time ideas, planning help, and AI-generated insights. Whether you're seeking the top hikes in Texas, the quietest waterfalls, or the best weekend paddle loops — our Trail Notes deliver fresh finds and smart planning tools curated just for you.</p>
+    <h1>Trail Notes & AI Picks</h1>
+    <p>Welcome to your basecamp for curated hikes, expert tips, and AI-generated trail insights. Whether you're planning a weekend escape or a long-distance trek, this is where you'll discover the gems, the hacks, and the gear recs to make your trip epic.</p>
 
-    <div class="highlight-box">
-      <h2>🔥 AI Feature Coming Soon: Local Adventure Generator</h2>
-      <p>Input your location and preferences (distance, activity, difficulty), and our AI will recommend a full itinerary with hikes, free campsites, and weather tips.</p>
-    </div>
+    <section class="trail-highlight">
+      <h2>Top 10 Hikes Near Rockport, Texas</h2>
+      <p>Ready to hit the trails? Explore our curated list of the top 10 hikes around Rockport for every adventure level. These are handpicked with AI + local insight — updated regularly with trail info, parking, difficulty, and tips.</p>
+      <img src="images/top10_rockport_hikes_placeholder.png" alt="Top 10 Hikes Near Rockport" class="highlight-img" />
+      <a href="#" class="cta-button">View the List</a>
+    </section>
 
-    <div class="highlight-box">
-      <h2>🗺️ Top 5 Hikes Near Rockport, TX</h2>
-      <ul>
-        <li>Goose Island State Park – flat coastal trail under oak canopy</li>
-        <li>Aransas National Wildlife Refuge – best for wildlife photography</li>
-        <li>Big Tree Trail – short & iconic, near the famous oak</li>
-        <li>Lydia Ann Lighthouse Trail (via paddle) – mixed-mode adventure</li>
-        <li>Rockport Beach Walk – beginner-friendly beach stroll</li>
-      </ul>
-    </div>
   </main>
+
+  <footer>
+    &copy; 2025 Trek4Free. All rights reserved.
+  </footer>
 </body>
 </html>
 
