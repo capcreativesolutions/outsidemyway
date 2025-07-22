@@ -1,0 +1,38 @@
+[
+  {
+    "title": "Lost Maples State Natural Area - East Trail Loop",
+    "location": "Vanderpool, Texas",
+    "distance": "7.1 miles",
+    "difficulty": "Moderate",
+    "features": [
+      "Scenic vistas",
+      "Water crossings",
+      "Fall foliage"
+    ],
+    "description": "This loop trail is popular in the fall for its vibrant maple trees. Expect rocky paths, steep inclines, and great overlooks. Water levels vary seasonally.",
+    "tags": [
+      "hiking",
+      "state park",
+      "fall colors"
+    ],
+    "last_updated": "2025-07-22"
+  },
+  {
+    "title": "Guadalupe River Paddle Trail",
+    "location": "New Braunfels, Texas",
+    "distance": "5.3 miles",
+    "difficulty": "Easy to Moderate",
+    "features": [
+      "Slow current",
+      "Access points",
+      "Scenic limestone banks"
+    ],
+    "description": "Gentle paddle route with family-friendly access. Great for tubing, kayaking, or SUP. Watch for crowds on weekends and float responsibly.",
+    "tags": [
+      "paddling",
+      "river",
+      "family-friendly"
+    ],
+    "last_updated": "2025-07-22"
+  }
+]
