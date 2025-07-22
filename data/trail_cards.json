@@ -1,38 +1,26 @@
 [
   {
-    "title": "Lost Maples State Natural Area - East Trail Loop",
+    "title": "Lost Maples East Trail",
     "location": "Vanderpool, Texas",
-    "distance": "7.1 miles",
+    "activity": "Hiking",
     "difficulty": "Moderate",
-    "features": [
-      "Scenic vistas",
-      "Water crossings",
-      "Fall foliage"
-    ],
-    "description": "This loop trail is popular in the fall for its vibrant maple trees. Expect rocky paths, steep inclines, and great overlooks. Water levels vary seasonally.",
-    "tags": [
-      "hiking",
-      "state park",
-      "fall colors"
-    ],
-    "last_updated": "2025-07-22"
+    "length": "4.6 miles",
+    "summary": "Scenic limestone canyons with fall foliage and panoramic overlooks."
   },
   {
-    "title": "Guadalupe River Paddle Trail",
+    "title": "Panther Canyon Nature Trail",
     "location": "New Braunfels, Texas",
-    "distance": "5.3 miles",
+    "activity": "Hiking",
     "difficulty": "Easy to Moderate",
-    "features": [
-      "Slow current",
-      "Access points",
-      "Scenic limestone banks"
-    ],
-    "description": "Gentle paddle route with family-friendly access. Great for tubing, kayaking, or SUP. Watch for crowds on weekends and float responsibly.",
-    "tags": [
-      "paddling",
-      "river",
-      "family-friendly"
-    ],
-    "last_updated": "2025-07-22"
+    "length": "1.6 miles",
+    "summary": "Shaded forest trail with a seasonal creek, great for birdwatching."
+  },
+  {
+    "title": "Blunn Creek Preserve Trail",
+    "location": "Austin, Texas",
+    "activity": "Hiking",
+    "difficulty": "Moderate",
+    "length": "1.5 miles",
+    "summary": "Short loop trail with lava rock, views of downtown Austin, and native plants."
   }
 ]
