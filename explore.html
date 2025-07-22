@@ -17,7 +17,7 @@
     header {
       display: flex;
       align-items: center;
-      background-color: #244424;
+      background-color: #2a3b2a;
       padding: 12px 20px;
       color: white;
       z-index: 1001;
@@ -40,7 +40,7 @@
       flex-direction: column;
       padding: 12px;
       width: 260px;
-      background: #f2f9f0;
+      background: #f0f5ec;
       border-right: 1px solid #ccc;
       z-index: 1000;
     }
@@ -85,16 +85,21 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     #legend {
-      padding: 10px;
-      font-size: 0.9em;
-      background: #fff;
-      border-top: 1px solid #ccc;
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: #ffffffcc;
+      padding: 8px 12px;
+      font-size: 0.85em;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      z-index: 1000;
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="logo.png" alt="Trek4Free logo">
+    <img src="images/logo.png" alt="Trek4Free logo">
     <h1>Trek4Free Explorer</h1>
   </header>
   <div id="main">
@@ -119,12 +124,13 @@
       <div id="search-container">
         <input type="text" id="search" placeholder="Search name...">
       </div>
+      <div id="legend">
+        <strong>Map Legend:</strong><br>
+        🟢 Hiking<br>🔵 Free Camping<br>🔷 Swimming Hole<br>⚪ Other
+      </div>
     </div>
   </div>
   <div id="results"></div>
-  <div id="legend">
-    <strong>Map Legend:</strong> 🟢 Hiking | 🔵 Free Camping | 🔷 Swimming Hole | ⚪ Other
-  </div>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -182,7 +188,8 @@
       data.forEach(loc => {
         if (unwantedCategories.includes(loc.category)) return;
         const cat = categoryMap[loc.category] || loc.category;
-        const color = cat === 'Hiking' ? 'green' : cat === 'Free Camping' ? 'blue' : cat === 'Swimming Hole' ? 'aqua' : 'gray';
+        const color = cat === 'Hiking' ? 'green' : cat === 'Free Camping' ? 'blue' : cat === 'Swimming Hole' ? 'deepskyblue' : 'gray';
+        const shape = cat === 'Swimming Hole' ? 'triangle' : 'circle';
         const marker = L.circleMarker([loc.lat, loc.lon], {
           radius: 8,
           fillColor: color,
@@ -203,5 +210,6 @@
   </script>
 </body>
 </html>
+
 
 
