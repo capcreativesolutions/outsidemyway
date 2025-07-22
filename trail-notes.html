@@ -3,84 +3,65 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trek4Free | Trail Notes</title>
-  <meta name="description" content="Field notes and tips for exploring America's top free hiking and camping areas." />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" />
+  <title>Trail Notes | Trek4Free</title>
+  <meta name="description" content="AI-enhanced trail notes and summaries from the Trek4Free community." />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap">
   <style>
     body {
       margin: 0;
       font-family: 'Raleway', sans-serif;
-      background: linear-gradient(to bottom right, #e3dcd2, #c5b9ac);
-      color: #3c3c3c;
+      background-color: #f5f2ef;
+      color: #333;
     }
     header {
+      background-color: #594a42;
+      color: white;
+      padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1rem 2rem;
-      background-color: #594a42;
-      color: #fff;
     }
     header img {
-      height: 50px;
+      height: 40px;
     }
     nav a {
       margin-left: 1rem;
-      color: #fff;
+      color: white;
       text-decoration: none;
       font-weight: bold;
     }
     nav a:hover {
       text-decoration: underline;
     }
-    .hero {
-      padding: 4rem 2rem 2rem;
-      text-align: center;
+    .container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1rem;
     }
-    .hero h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
+    h1 {
+      text-align: center;
       color: #2e2e2e;
     }
-    .hero p {
-      max-width: 700px;
-      margin: 0 auto;
-      font-size: 1.1rem;
-    }
-    .notes-section {
-      background: url('/images/topo-lines-light.png');
-      background-size: cover;
-      background-repeat: no-repeat;
-      padding: 3rem 2rem;
-    }
-    .notes-section h2 {
-      text-align: center;
-      font-size: 2rem;
+    .trail-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 1.5rem;
       margin-bottom: 2rem;
     }
-    .note-box {
-      background-color: rgba(255, 255, 255, 0.9);
-      border-radius: 12px;
-      padding: 1.5rem;
-      max-width: 800px;
-      margin: 1rem auto;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    .trail-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 1rem 0;
     }
-    .cta-button {
-      display: inline-block;
-      background-color: #8e735b;
-      color: #fff;
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.3s;
-      margin-top: 1rem;
+    .trail-card h2 {
+      margin-top: 0;
+      color: #444;
     }
-    .cta-button:hover {
-      background-color: #6b594a;
+    .trail-card .meta {
+      font-size: 0.9rem;
+      color: #666;
     }
     footer {
       text-align: center;
@@ -92,42 +73,57 @@
   </style>
 </head>
 <body>
-
   <header>
     <img src="/images/trek4free-logo.png" alt="Trek4Free Logo">
     <nav>
       <a href="index.html">Home</a>
-      <a href="explore.html">Explore</a>
-      <a href="trail-notes.html">Trail Notes</a>
+      <a href="explore.html">Map</a>
       <a href="top-hikes-texas.html">Top Hikes</a>
     </nav>
   </header>
 
-  <section class="hero">
-    <h1>Trail Notes & Local Wisdom</h1>
-    <p>Stories, tips, and firsthand knowledge from free hiking and camping trips around the country.</p>
-  </section>
-
-  <section class="notes-section">
-    <h2>Recent Field Notes</h2>
-
-    <div class="note-box">
-      <h3>🎒 West Texas: Where the Desert Hides the Best Campsites</h3>
-      <p>Big Bend’s secret pull-outs, water refill strategies, and sunrise hikes with no one around.</p>
-      <a href="#" class="cta-button">Read More</a>
-    </div>
-
-    <div class="note-box">
-      <h3>🪵 How to Find Firewood Legally and Responsibly</h3>
-      <p>Leave No Trace meets warmth and convenience. Practical advice for ethical wild camping.</p>
-      <a href="#" class="cta-button">Read More</a>
-    </div>
-
-  </section>
+  <div class="container">
+    <h1>Trail Notes</h1>
+    <div id="trail-container"></div>
+  </div>
 
   <footer>
     &copy; 2025 Trek4Free. All rights reserved.
   </footer>
+
+  <script>
+    fetch('data/trail_cards.json')
+      .then(response => response.json())
+      .then(data => {
+        const container = document.getElementById('trail-container');
+        data.forEach(trail => {
+          const card = document.createElement('div');
+          card.className = 'trail-card';
+
+          const imgSrc = trail.image_url && trail.image_url.startsWith('http')
+            ? trail.image_url
+            : 'images/image_placeholder.png';
+
+          card.innerHTML = `
+            <h2>${trail.name || 'Unnamed Trail'}</h2>
+            <p class="meta">Location: ${trail.location || 'N/A'}<br>
+            Activity: ${trail.activity || 'N/A'}<br>
+            Difficulty: ${trail.difficulty || 'N/A'}<br>
+            Length: ${trail.length || 'N/A'}</p>
+            <img src="${imgSrc}" alt="Trail image">
+            <p>${trail.description || 'No description available.'}</p>
+            ${trail.map_url ? `<p><a href="${trail.map_url}" target="_blank">View on Map</a></p>` : ''}
+          `;
+
+          container.appendChild(card);
+        });
+      })
+      .catch(err => {
+        console.error('Failed to load trail data:', err);
+        document.getElementById('trail-container').innerHTML = '<p>Error loading trail notes.</p>';
+      });
+  </script>
 </body>
 </html>
+
 
