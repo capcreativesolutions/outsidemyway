@@ -4,17 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Trail Notes | Trek4Free</title>
-  <meta name="description" content="Trek4Free Trail Notes brings you curated hikes, AI-generated trail content, and real-time trip planning tools for adventurers." />
+  <meta name="description" content="Trail Notes offers curated outdoor adventure summaries powered by AI and real-time data. Discover new hikes, climbs, paddles, and bike routes." />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" />
   <style>
     body {
-      margin: 0;
       font-family: 'Raleway', sans-serif;
-      background: #f6f4f0;
-      color: #333;
+      margin: 0;
+      background: #f6f3ef;
+      color: #2f2f2f;
     }
     header {
-      background-color: #594a42;
+      background-color: #5b4e42;
       color: white;
       padding: 1rem 2rem;
       display: flex;
@@ -22,84 +22,102 @@
       align-items: center;
     }
     header a {
-      color: white;
+      color: #fff;
       text-decoration: none;
       font-weight: bold;
     }
-    main {
+    .container {
       padding: 2rem;
-      max-width: 960px;
+      max-width: 1000px;
       margin: auto;
     }
     h1 {
       font-size: 2.5rem;
       margin-bottom: 1rem;
-      color: #2e2e2e;
     }
-    p {
-      font-size: 1.1rem;
-      line-height: 1.6;
+    .trail-card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
-    .trail-highlight {
-      padding: 3rem 2rem;
-      text-align: center;
-      background-color: #fdfaf7;
-      border-top: 2px solid #ccc;
-      border-bottom: 2px solid #ccc;
-    }
-    .trail-highlight img {
-      max-width: 100%;
+    .trail-card img {
+      width: 100%;
       height: auto;
-      margin: 2rem 0;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    .trail-highlight .cta-button {
-      background-color: #8e735b;
-      color: #fff;
-      padding: 0.75rem 1.25rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 6px;
-      text-decoration: none;
-      display: inline-block;
-      margin-top: 1rem;
+    .trail-card-content {
+      padding: 1.5rem;
     }
-    .trail-highlight .cta-button:hover {
-      background-color: #6b594a;
+    .trail-card-content h2 {
+      margin-top: 0;
+    }
+    .trail-card-content p {
+      margin: 0.5rem 0;
     }
     footer {
-      background-color: #eee4db;
-      padding: 1rem;
       text-align: center;
+      padding: 1rem;
+      background-color: #eee4db;
       font-size: 0.85rem;
-      color: #555;
-      margin-top: 2rem;
     }
   </style>
 </head>
 <body>
   <header>
-    <a href="index.html">&larr; Back to Trek4Free</a>
-    <span>Trail Notes</span>
+    <div><a href="/">Trek4Free</a></div>
+    <nav>
+      <a href="/explore.html">Explore the Map</a>
+    </nav>
   </header>
 
-  <main>
-    <h1>Trail Notes & AI Picks</h1>
-    <p>Welcome to your basecamp for curated hikes, expert tips, and AI-generated trail insights. Whether you're planning a weekend escape or a long-distance trek, this is where you'll discover the gems, the hacks, and the gear recs to make your trip epic.</p>
-
-    <section class="trail-highlight">
-      <h2>Top 10 Hikes Near Rockport, Texas</h2>
-      <p>Ready to hit the trails? Explore our curated list of the top 10 hikes around Rockport for every adventure level. These are handpicked with AI + local insight — updated regularly with trail info, parking, difficulty, and tips.</p>
-      <img src="images/top10_rockport_hikes_placeholder.png" alt="Top 10 Hikes Near Rockport" class="highlight-img" />
-      <a href="#" class="cta-button">View the List</a>
-    </section>
-
-  </main>
+  <div class="container">
+    <h1>Trail Notes</h1>
+    <div id="trail-container"></div>
+  </div>
 
   <footer>
     &copy; 2025 Trek4Free. All rights reserved.
   </footer>
+
+  <script>
+    async function loadTrails() {
+      const response = await fetch('/data/trail_cards.json');
+      const trails = await response.json();
+      const container = document.getElementById('trail-container');
+
+      trails.forEach(trail => {
+        const card = document.createElement('div');
+        card.className = 'trail-card';
+
+        if (trail.image_url) {
+          const img = document.createElement('img');
+          img.src = trail.image_url;
+          img.alt = trail.name;
+          card.appendChild(img);
+        }
+
+        const content = document.createElement('div');
+        content.className = 'trail-card-content';
+
+        content.innerHTML = `
+          <h2>${trail.name}</h2>
+          <p><strong>Location:</strong> ${trail.location}</p>
+          <p><strong>Activity:</strong> ${trail.activity}</p>
+          <p><strong>Difficulty:</strong> ${trail.difficulty}</p>
+          <p><strong>Length:</strong> ${trail.length}</p>
+          <p>${trail.summary}</p>
+        `;
+
+        card.appendChild(content);
+        container.appendChild(card);
+      });
+    }
+
+    loadTrails();
+  </script>
 </body>
 </html>
 
