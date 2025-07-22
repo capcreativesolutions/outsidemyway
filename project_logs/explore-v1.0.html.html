@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trek4Free Map Explorer</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      background-color: #f5f1eb;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      background-color: #4b3a2f;
+      padding: 12px 20px;
+      color: white;
+      z-index: 1001;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    header img {
+      height: 50px;
+      margin-right: 15px;
+    }
+    header h1 {
+      font-size: 1.8em;
+      margin: 0;
+    }
+    #main {
+      display: flex;
+      flex-direction: row;
+    }
+    #filters {
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      width: 260px;
+      background: #f6f1e8;
+      border-right: 1px solid #ccc;
+      z-index: 1000;
+    }
+    .filter-group {
+      margin-bottom: 20px;
+    }
+    .filter-group h3 {
+      margin-bottom: 10px;
+    }
+    .checkbox-list label {
+      display: block;
+      margin-bottom: 6px;
+    }
+    #map {
+      height: 70vh;
+      flex-grow: 1;
+      position: relative;
+      z-index: 1;
+    }
+    #search-container {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+    #results {
+      padding: 10px;
+      background: #f9f9f9;
+      height: 30vh;
+      overflow-y: auto;
+    }
+    .location-card {
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    #legend {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #ffffffcc;
+      padding: 8px 12px;
+      font-size: 0.85em;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="images/logo.png" alt="Trek4Free logo">
+    <h1>Trek4Free Explorer</h1>
+  </header>
+  <div id="main">
+    <div id="filters">
+      <div class="filter-group">
+        <h3>Popular Filters</h3>
+        <div class="checkbox-list" id="popularFilters"></div>
+      </div>
+      <div class="filter-group">
+        <h3>More Categories</h3>
+        <div class="checkbox-list" id="moreCategories">
+          <label><input type="checkbox" class="more-filter-checkbox" value="Dog Friendly" onchange="filterMapPins()"> Dog Friendly</label>
+          <label><input type="checkbox" class="more-filter-checkbox" value="Mountain Biking" onchange="filterMapPins()"> Mountain Biking</label>
+          <label><input type="checkbox" class="more-filter-checkbox" value="Rock Climbing" onchange="filterMapPins()"> Rock Climbing</label>
+          <label><input type="checkbox" class="more-filter-checkbox" value="Hiking - Easy" onchange="filterMapPins()"> Hiking - Easy</label>
+          <label><input type="checkbox" class="more-filter-checkbox" value="Hiking - Moderate" onchange="filterMapPins()"> Hiking - Moderate</label>
+          <label><input type="checkbox" class="more-filter-checkbox" value="Hiking - Hard" onchange="filterMapPins()"> Hiking - Hard</label>
+        </div>
+      </div>
+    </div>
+    <div id="map">
+      <div id="search-container">
+        <input type="text" id="search" placeholder="Search name...">
+      </div>
+      <div id="legend">
+        <strong>Map Legend:</strong><br>
+        <span style="color:green;">●</span> Hiking<br>
+        <span style="color:blue;">●</span> Free Camping<br>
+        <span style="color:deepskyblue;">●</span> Swimming Hole<br>
+        <span style="color:gray;">●</span> Other
+      </div>
+    </div>
+  </div>
+  <div id="results"></div>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([37.8, -96], 4);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+    }).addTo(map);
+
+    let markers = [];
+    const categoryMap = {
+      "Hike": "Hiking",
+      "Hiking": "Hiking",
+      "Trail": "Hiking",
+      "Free Camping": "Free Camping",
+      "Camping": "Camping",
+      "Swimming Hole": "Swimming Hole"
+    };
+    const unwantedCategories = ["Fire Tower", "Cultural Site", "Specialized Sport Site"];
+    const validCategories = Object.values(categoryMap).filter((v, i, self) => v && self.indexOf(v) === i);
+    const filterContainer = document.getElementById('popularFilters');
+
+    validCategories.forEach(cat => {
+      const label = document.createElement('label');
+      label.innerHTML = `<input type="checkbox" class="filter-checkbox" value="${cat}" onchange="filterMapPins()"> ${cat}`;
+      filterContainer.appendChild(label);
+    });
+
+    function filterMapPins() {
+      const selectedPopular = Array.from(document.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value);
+      const selectedMore = Array.from(document.querySelectorAll('.more-filter-checkbox:checked')).map(cb => cb.value);
+      const allSelected = selectedPopular.concat(selectedMore);
+      markers.forEach(marker => {
+        const cat = categoryMap[marker.options.category] || marker.options.category;
+        if (allSelected.length === 0) {
+          map.removeLayer(marker);
+        } else if (allSelected.includes(cat)) {
+          marker.addTo(map);
+        } else {
+          map.removeLayer(marker);
+        }
+      });
+    }
+
+    function updateMarkerPopup(marker, data) {
+      const popupContent = `<strong>${data.name}</strong><br>${data.category}<br>${data.notes || ''}`;
+      marker.bindPopup(popupContent);
+    }
+
+    async function fetchData() {
+      const response = await fetch('locations.json');
+      const data = await response.json();
+      const resultsContainer = document.getElementById('results');
+      resultsContainer.innerHTML = '';
+      data.forEach(loc => {
+        if (unwantedCategories.includes(loc.category)) return;
+        const cat = categoryMap[loc.category] || loc.category;
+        const color = cat === 'Hiking' ? 'green' : cat === 'Free Camping' ? 'blue' : cat === 'Swimming Hole' ? 'deepskyblue' : 'gray';
+        const marker = L.circleMarker([loc.lat, loc.lon], {
+          radius: 8,
+          fillColor: color,
+          color: "#000",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8,
+          category: cat
+        });
+        marker.on('click', () => {
+          resultsContainer.innerHTML = `<div class='location-card'><h4>${loc.name}</h4><p><strong>Category:</strong> ${cat}</p><p>${loc.notes || 'No description available.'}</p></div>`;
+        });
+        markers.push(marker);
+      });
+    }
+
+    fetchData();
+  </script>
+</body>
+</html>
