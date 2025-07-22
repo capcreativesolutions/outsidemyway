@@ -4,51 +4,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trail Notes | Trek4Free</title>
+  <title>Trail Notes</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
-  <header>
-    <div class="header-container">
+  <header class="site-header">
+    <div class="logo-title">
       <a href="index.html">
-        <img src="images/trek4free-logo.png" alt="Trek4Free Logo" class="logo" />
+        <img src="images/trek4free-logo.png" alt="Trek4Free Logo" class="site-logo" />
       </a>
-      <nav>
-        <a href="index.html">Home</a>
-        <a href="explore.html">Explore</a>
-        <a href="trail-notes.html">Top Hikes</a>
-      </nav>
     </div>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="explore.html">Explore</a>
+      <a href="trail-notes.html">Top Hikes</a>
+    </nav>
   </header>
 
-  <main class="trail-detail">
-    <div class="container">
-      <h1>Trail Notes</h1>
-      <div id="trailContent"></div>
-    </div>
+  <main class="content-container">
+    <h1>Trail Notes</h1>
+    <div id="trailContainer"></div>
   </main>
 
-  <footer>
-    <p>&copy; 2025 Trek4Free. All rights reserved.</p>
-  </footer>
-
   <script>
-    async function fetchTrailData() {
-      const params = new URLSearchParams(window.location.search);
-      const trailTitle = params.get("trail");
+    async function loadTrailData() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const trailTitle = urlParams.get("trail");
+      const trailContainer = document.getElementById("trailContainer");
 
-      const response = await fetch("data/trail_cards.json");
-      const trails = await response.json();
-
-      const trail = trails.find(
-        (t) => t.title === decodeURIComponent(trailTitle)
-      );
-
-      const trailContent = document.getElementById("trailContent");
-      if (!trail) {
-        trailContent.innerHTML = `
-          <div class="card">
+      if (!trailTitle) {
+        trailContainer.innerHTML = `
+          <div class="not-found">
             <h2>Trail Not Found</h2>
             <p>Try returning to the map and selecting another trail.</p>
           </div>
@@ -56,34 +43,47 @@
         return;
       }
 
-      const imageName = trail.title.toLowerCase().replace(/[^a-z0-9]/g, "-") + ".jpg";
-      const imageUrl = `images/${imageName}`;
+      try {
+        const response = await fetch("data/trail_cards.json");
+        const trails = await response.json();
 
-      const imgTest = new Image();
-      imgTest.src = imageUrl;
-      imgTest.onload = () => renderTrail(imageUrl);
-      imgTest.onerror = () => renderTrail("images/image_placeholder.png");
+        const matchedTrail = trails.find(
+          (trail) => trail.title === decodeURIComponent(trailTitle)
+        );
 
-      function renderTrail(imageSrc) {
-        trailContent.innerHTML = `
-          <div class="trail-detail-card">
-            <img src="${imageSrc}" alt="${trail.title}" class="trail-image" />
-            <h2>${trail.title}</h2>
-            <p><strong>Location:</strong> ${trail.location}</p>
-            <p><strong>Activity:</strong> ${trail.tags?.[0] || "N/A"}</p>
-            <p><strong>Difficulty:</strong> ${trail.difficulty}</p>
-            <p><strong>Length:</strong> ${trail.distance}</p>
-            <p>${trail.description}</p>
+        if (!matchedTrail) {
+          trailContainer.innerHTML = `
+            <div class="not-found">
+              <h2>Trail Not Found</h2>
+              <p>Try returning to the map and selecting another trail.</p>
+            </div>
+          `;
+          return;
+        }
+
+        const placeholderImage = `images/image_placeholder.png`;
+        const imageSrc = placeholderImage; // Logic for future external image sourcing could be inserted here.
+
+        trailContainer.innerHTML = `
+          <div class="trail-card">
+            <img src="${imageSrc}" alt="${matchedTrail.title}" class="trail-image" />
+            <h2>${matchedTrail.title}</h2>
+            <p><strong>Location:</strong> ${matchedTrail.location}</p>
+            <p><strong>Activity:</strong> ${matchedTrail.tags?.[0] ?? "hiking"}</p>
+            <p><strong>Difficulty:</strong> ${matchedTrail.difficulty}</p>
+            <p><strong>Length:</strong> ${matchedTrail.distance}</p>
+            <p>${matchedTrail.description}</p>
           </div>
         `;
+      } catch (error) {
+        trailContainer.innerHTML = `<p>Error loading trail data.</p>`;
+        console.error("Error fetching trail data:", error);
       }
     }
 
-    fetchTrailData();
+    loadTrailData();
   </script>
 </body>
 
 </html>
-
-
 
