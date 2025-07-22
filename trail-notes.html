@@ -1,24 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trail Notes</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trail Notes | Trek4Free</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
   <header>
-    <img src="images/logo.png" alt="Trek4Free Logo" class="logo">
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="explore.html">Explore</a>
-      <a href="top-hikes.html">Top Hikes</a>
-    </nav>
+    <div class="header-container">
+      <a href="index.html">
+        <img src="images/trek4free-logo.png" alt="Trek4Free Logo" class="logo" />
+      </a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="explore.html">Explore</a>
+        <a href="trail-notes.html">Top Hikes</a>
+      </nav>
+    </div>
   </header>
 
-  <main>
-    <h1>Trail Notes</h1>
-    <div id="trailContainer" class="trail-container"></div>
+  <main class="trail-detail">
+    <div class="container">
+      <h1>Trail Notes</h1>
+      <div id="trailContent"></div>
+    </div>
   </main>
 
   <footer>
@@ -26,36 +34,56 @@
   </footer>
 
   <script>
-    fetch('data/trail_cards.json')
-      .then(response => response.json())
-      .then(data => {
-        const container = document.getElementById('trailContainer');
-        data.forEach(trail => {
-          const card = document.createElement('div');
-          card.className = 'trail-card';
+    async function fetchTrailData() {
+      const params = new URLSearchParams(window.location.search);
+      const trailTitle = params.get("trail");
 
-          // Placeholder logic (image fallback)
-          let imageURL = trail.image_url || 'images/placeholder.png';
+      const response = await fetch("data/trail_cards.json");
+      const trails = await response.json();
 
-          card.innerHTML = `
-            <img src="${imageURL}" alt="${trail.title || 'Trail Image'}">
-            <h2>${trail.title || 'Unnamed Trail'}</h2>
-            <p><strong>Location:</strong> ${trail.location || 'N/A'}</p>
-            <p><strong>Activity:</strong> ${trail.tags?.[0] || 'N/A'}</p>
-            <p><strong>Difficulty:</strong> ${trail.difficulty || 'N/A'}</p>
-            <p><strong>Length:</strong> ${trail.distance || 'N/A'}</p>
-            <p>${trail.description || ''}</p>
-          `;
+      const trail = trails.find(
+        (t) => t.title === decodeURIComponent(trailTitle)
+      );
 
-          container.appendChild(card);
-        });
-      })
-      .catch(error => {
-        console.error('Failed to load trail data:', error);
-        document.getElementById('trailContainer').innerHTML = '<p>Error loading trails.</p>';
-      });
+      const trailContent = document.getElementById("trailContent");
+      if (!trail) {
+        trailContent.innerHTML = `
+          <div class="card">
+            <h2>Trail Not Found</h2>
+            <p>Try returning to the map and selecting another trail.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const imageName = trail.title.toLowerCase().replace(/[^a-z0-9]/g, "-") + ".jpg";
+      const imageUrl = `images/${imageName}`;
+
+      const imgTest = new Image();
+      imgTest.src = imageUrl;
+      imgTest.onload = () => renderTrail(imageUrl);
+      imgTest.onerror = () => renderTrail("images/image_placeholder.png");
+
+      function renderTrail(imageSrc) {
+        trailContent.innerHTML = `
+          <div class="trail-detail-card">
+            <img src="${imageSrc}" alt="${trail.title}" class="trail-image" />
+            <h2>${trail.title}</h2>
+            <p><strong>Location:</strong> ${trail.location}</p>
+            <p><strong>Activity:</strong> ${trail.tags?.[0] || "N/A"}</p>
+            <p><strong>Difficulty:</strong> ${trail.difficulty}</p>
+            <p><strong>Length:</strong> ${trail.distance}</p>
+            <p>${trail.description}</p>
+          </div>
+        `;
+      }
+    }
+
+    fetchTrailData();
   </script>
 </body>
+
 </html>
+
 
 
