@@ -3,44 +3,143 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trek4Free - Your Adventure Starts Here</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" href="images/favicon.ico" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <title>Trek4Free | Adventure Starts Here</title>
+  <meta name="description" content="Find free camping near your next outdoor adventure. Trek4Free helps you discover trails, climbing, paddling, and biking routes with free places to stay nearby." />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Raleway', sans-serif;
+      background: linear-gradient(to bottom right, #e3dcd2, #c5b9ac);
+      color: #3c3c3c;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background-color: #594a42;
+      color: #fff;
+    }
+    header img {
+      height: 50px;
+    }
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: #2e2e2e;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin-bottom: 2rem;
+    }
+    .hero img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-top: 2rem;
+    }
+    .cta-button {
+      background-color: #8e735b;
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+    .cta-button:hover {
+      background-color: #6b594a;
+    }
+    .why-section {
+      background: url('/images/topo-lines-light.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .why-section h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #2e2e2e;
+    }
+    .why-boxes {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+    }
+    .why-box {
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      padding: 1.5rem;
+      max-width: 300px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .why-box h3 {
+      margin-top: 0;
+    }
+    .feature-img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin: 2rem 0;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.85rem;
+      background-color: #eee4db;
+      color: #555;
+    }
+  </style>
 </head>
 <body>
-  <header class="hero">
-    <h1>Welcome to Trek4Free</h1>
-    <p>Find epic hikes, campsites, and hidden adventures without spending a dime.</p>
+  <header>
+    <img src="/images/trek4free-logo.png" alt="Trek4Free Logo">
     <nav>
-      <a href="trail-notes.html" class="btn">Trail Notes</a>
-      <a href="top-hikes-texas.html" class="btn">Top Hikes</a>
+      <a href="https://clinquant-biscochitos-75de17.netlify.app/explore.html" class="cta-button">Explore the Map</a>
     </nav>
   </header>
 
-  <section class="why-trek">
+  <section class="hero">
+    <h1>Find Adventure. Sleep Free.</h1>
+    <p>Discover epic trails, hidden swimming holes, thrilling climbs, and paddling access points — all with nearby free places to stay. Trek4Free helps you plan smarter, travel cheaper, and explore more.</p>
+    <a href="https://clinquant-biscochitos-75de17.netlify.app/explore.html" class="cta-button">Start Exploring</a>
+    <img src="/images/trek4free-hero.png" alt="Hero Image with Topo character">
+  </section>
+
+  <section class="why-section">
     <h2>Why Trek4Free?</h2>
-    <div class="benefits">
-      <div class="benefit">
-        <img src="images/waterfall.png" alt="Waterfall" />
-        <h3>Free Destinations</h3>
-        <p>Explore natural spots that don’t break the bank.</p>
+    <div class="why-boxes">
+      <div class="why-box">
+        <h3>Save Money</h3>
+        <p>Skip expensive campgrounds. Use our database to find free, legal places to stay near the action.</p>
       </div>
-      <div class="benefit">
-        <img src="images/campfire.png" alt="Campfire" />
-        <h3>Authentic Experiences</h3>
-        <p>No reservations needed. Just you, nature, and a backpack.</p>
+      <div class="why-box">
+        <h3>Plan Smarter</h3>
+        <p>Our map integrates trails, paddling, climbing and more — all linked to nearby free options.</p>
       </div>
-      <div class="benefit">
-        <img src="images/topo-lines-light.png" alt="Map Lines" />
-        <h3>AI Trail Notes</h3>
-        <p>Curated insights, tips, and maps powered by live data.</p>
+      <div class="why-box">
+        <h3>Go Farther</h3>
+        <p>Fuel your weekend with fewer logistics. Less time planning = more time outdoors.</p>
       </div>
     </div>
+    <img src="/images/waterfall.png" alt="Topo Character at Waterfall" class="feature-img">
   </section>
 
   <footer>
-    <p>&copy; 2025 Trek4Free. Built by nature nerds for nature nerds.</p>
+    &copy; 2025 Trek4Free. All rights reserved.
   </footer>
 </body>
 </html>
