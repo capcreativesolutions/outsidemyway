@@ -4,18 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Trail Notes | Trek4Free</title>
-  <meta name="description" content="Trail Notes offers curated outdoor adventure summaries powered by AI and real-time data. Discover new hikes, climbs, paddles, and bike routes." />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" />
   <style>
     body {
-      font-family: 'Raleway', sans-serif;
       margin: 0;
-      background: #f6f3ef;
-      color: #2f2f2f;
+      font-family: 'Raleway', sans-serif;
+      background-color: #f8f4f0;
+      color: #333;
     }
     header {
-      background-color: #5b4e42;
-      color: white;
+      background-color: #594a42;
+      color: #fff;
       padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
@@ -26,98 +25,62 @@
       text-decoration: none;
       font-weight: bold;
     }
-    .container {
-      padding: 2rem;
-      max-width: 1000px;
-      margin: auto;
-    }
     h1 {
+      padding: 2rem 2rem 0 2rem;
+      margin: 0;
       font-size: 2.5rem;
-      margin-bottom: 1rem;
     }
-    .trail-card {
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      margin-bottom: 2rem;
-      overflow: hidden;
+    .trail-container {
       display: flex;
       flex-direction: column;
+      gap: 1.5rem;
+      padding: 2rem;
     }
-    .trail-card img {
-      width: 100%;
-      height: auto;
-    }
-    .trail-card-content {
+    .trail-card {
+      background-color: #fff;
+      border-radius: 8px;
       padding: 1.5rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
-    .trail-card-content h2 {
+    .trail-card h3 {
       margin-top: 0;
-    }
-    .trail-card-content p {
-      margin: 0.5rem 0;
-    }
-    footer {
-      text-align: center;
-      padding: 1rem;
-      background-color: #eee4db;
-      font-size: 0.85rem;
     }
   </style>
 </head>
 <body>
   <header>
-    <div><a href="/">Trek4Free</a></div>
-    <nav>
-      <a href="/explore.html">Explore the Map</a>
-    </nav>
+    <a href="index.html">← Back to Home</a>
+    <span>Trail Notes</span>
+    <a href="explore.html">Explore Map</a>
   </header>
 
-  <div class="container">
-    <h1>Trail Notes</h1>
-    <div id="trail-container"></div>
+  <h1>Trail Notes</h1>
+  <div class="trail-container" id="trailContainer">
+    <!-- Dynamic trail cards will appear here -->
   </div>
 
-  <footer>
-    &copy; 2025 Trek4Free. All rights reserved.
-  </footer>
-
   <script>
-    async function loadTrails() {
-      const response = await fetch('/data/trail_cards.json');
-      const trails = await response.json();
-      const container = document.getElementById('trail-container');
-
-      trails.forEach(trail => {
-        const card = document.createElement('div');
-        card.className = 'trail-card';
-
-        if (trail.image_url) {
-          const img = document.createElement('img');
-          img.src = trail.image_url;
-          img.alt = trail.name;
-          card.appendChild(img);
-        }
-
-        const content = document.createElement('div');
-        content.className = 'trail-card-content';
-
-        content.innerHTML = `
-          <h2>${trail.name}</h2>
-          <p><strong>Location:</strong> ${trail.location}</p>
-          <p><strong>Activity:</strong> ${trail.activity}</p>
-          <p><strong>Difficulty:</strong> ${trail.difficulty}</p>
-          <p><strong>Length:</strong> ${trail.length}</p>
-          <p>${trail.summary}</p>
-        `;
-
-        card.appendChild(content);
-        container.appendChild(card);
+    fetch('data/trail_cards.json')
+      .then(response => response.json())
+      .then(trailData => {
+        const container = document.getElementById('trailContainer');
+        trailData.forEach(trail => {
+          const card = document.createElement('div');
+          card.className = 'trail-card';
+          card.innerHTML = `
+            <h3>${trail.title}</h3>
+            <p><strong>Location:</strong> ${trail.location}</p>
+            <p><strong>Activity:</strong> ${trail.activity}</p>
+            <p><strong>Difficulty:</strong> ${trail.difficulty}</p>
+            <p><strong>Length:</strong> ${trail.length}</p>
+            <p>${trail.summary}</p>
+          `;
+          container.appendChild(card);
+        });
+      })
+      .catch(error => {
+        console.error('Error loading trail data:', error);
       });
-    }
-
-    loadTrails();
   </script>
 </body>
 </html>
-
