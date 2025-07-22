@@ -12,7 +12,7 @@ Our goal is to solve the fragmentation of outdoor recreation data across multipl
 |------|---------|
 | `index.html` | Landing page for Trek4Free with brand intro, SEO content, and call-to-action |
 | `explore.html` | Interactive map, filters, and user interface for exploring outdoor activities + camping |
-| `project-log.md` | Ongoing changelog for all development decisions and version history |
+| `project-log.md` | Ongoing changelog for all development decisions and version history. updated logs saved in project_logs folder |
 | `README.md` | This file – overview of the project structure and working methods |
 
 ---
