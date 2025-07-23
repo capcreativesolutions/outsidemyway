@@ -1,159 +1,73 @@
-/* Enhanced Trek4Free Styling */
-
-/* ===== Variables & Base Theme Colors ===== */
-:root {
-  --primary-brown: #3f2c1d;
-  --secondary-beige: #fefaf5;
-  --highlight-tan: #e9dfd2;
-  --accent-orange: #c7692b;
-  --text-dark: #1a1a1a;
-  --text-light: #ffffff;
-  --max-width: 1200px;
-  --font-stack: 'Inter', sans-serif;
-}
-
-/* ===== Base Reset & Global ===== */
 body {
   margin: 0;
-  font-family: var(--font-stack);
-  background-color: var(--secondary-beige);
-  color: var(--text-dark);
-  line-height: 1.6;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  background-color: #fdf9f4;
+  color: #2d2d2d;
 }
 
-img {
-  max-width: 100%;
-  display: block;
+nav {
+  background-color: #4d2c1a;
+  color: #fff;
+  padding: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.5rem;
 }
 
-h1, h2, h3 {
-  font-weight: 700;
-  color: var(--primary-brown);
-  margin-bottom: 0.5em;
-}
-
-p {
-  margin-bottom: 1em;
-}
-
-a {
-  color: var(--accent-orange);
+nav a {
+  color: #fff;
   text-decoration: none;
+  font-weight: bold;
 }
 
-a:hover {
+nav a:hover {
   text-decoration: underline;
 }
 
-/* ===== Hero Section ===== */
-.hero {
-  position: relative;
-  background-image: url("images/trek4free-hero.png");
-  background-size: cover;
-  background-position: center;
-  height: 400px;
-  color: var(--text-light);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 0 1rem;
-}
-
-.hero h1 {
-  font-size: 3rem;
-  text-shadow: 2px 2px 5px rgba(0,0,0,0.6);
-}
-
-.hero p {
-  font-size: 1.2rem;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
-}
-
-/* ===== Button Links ===== */
-.button-link {
-  background-color: var(--accent-orange);
-  color: white;
-  padding: 0.6rem 1.2rem;
-  border: none;
-  border-radius: 5px;
-  margin: 0.5rem;
-  font-weight: 600;
-  text-decoration: none;
-  display: inline-block;
-  transition: background-color 0.3s ease;
-}
-
-.button-link:hover {
-  background-color: #a95620;
-}
-
-/* ===== Container & Layout ===== */
-.container {
-  max-width: var(--max-width);
-  margin: 2rem auto;
-  padding: 0 1rem;
-}
-
-.section {
-  padding: 3rem 0;
-}
-
-/* ===== Feature Cards ===== */
-.feature {
-  background-color: var(--highlight-tan);
-  border-radius: 10px;
-  padding: 2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.feature img {
-  border-radius: 10px;
-  margin-bottom: 1rem;
-}
-
-.feature h3 {
-  margin-top: 0;
-}
-
-/* ===== Top Hikes Page ===== */
-.top-hikes-header {
-  background-color: var(--highlight-tan);
+header {
   padding: 2rem;
   text-align: center;
-  border-bottom: 1px solid #ccc;
 }
 
-.top-hikes-header h1 {
+h1 {
+  font-size: 2rem;
   margin-bottom: 0.5rem;
 }
 
-.hike-card {
+.trail-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.trail-card {
   background-color: #fff;
-  padding: 1.5rem;
-  margin: 1.5rem auto;
-  border-radius: 8px;
-  max-width: 800px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  width: 280px;
+  transition: transform 0.2s ease-in-out;
+  text-align: center;
 }
 
-.hike-card h2 {
-  margin-top: 0;
+.trail-card:hover {
+  transform: scale(1.02);
 }
 
-.hike-card p {
-  margin: 0.25rem 0;
+.trail-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-bottom: 1px solid #eee;
 }
 
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
-  .hero h1 {
-    font-size: 2.2rem;
-  }
-  .hero p {
-    font-size: 1rem;
-  }
+.trail-card h3 {
+  font-size: 1.2rem;
+  padding: 1rem;
+  margin: 0;
+  background-color: #f8f4ee;
 }
+
 
