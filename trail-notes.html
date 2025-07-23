@@ -1,54 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Trail Notes</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="explore.html">Explore</a>
-    <a href="trail-notes.html">Trail Notes</a>
-  </nav>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trail Notes | Trek4Free</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="navbar">
+      <a href="index.html" class="logo-link">
+        <img src="images/logo.png" alt="Trek4Free logo" class="logo" />
+      </a>
+      <nav class="nav-buttons">
+        <a href="explore.html" class="nav-button">Explore the Map</a>
+        <a href="trail-notes.html" class="nav-button">Trail Notes</a>
+        <a href="#" class="nav-button">Top Hikes in Texas</a>
+      </nav>
+    </header>
 
-  <header>
-    <h1>Fallback Trail Cards</h1>
-    <p>Highlights of the best hiking trails in the United States</p>
-  </header>
+    <main>
+      <section class="trail-card-container">
+        <h1 class="page-title">Fallback Trail Cards</h1>
+        <p class="subtitle">Highlights of the best hiking trails in the United States</p>
 
-  <section class="trail-grid" id="fallback-trails">
-    <!-- Cards will be inserted by JavaScript -->
-  </section>
+        <div class="trail-card">
+          <img src="images/grandcanyon.png" alt="Grand Canyon" class="trail-image" />
+          <h2>Grand Canyon</h2>
+        </div>
 
-  <script>
-    const trails = [
-      { name: "Grand Canyon", image: "images/topograndcanyonandzion.png" },
-      { name: "Glacier", image: "images/Glacier.png" },
-      { name: "Zion", image: "images/topozion.png" },
-      { name: "Appalachian Trail", image: "images/AppalachianTrail.png" },
-      { name: "Yosemite", image: "images/Yosemite.png" },
-      { name: "Arches", image: "images/Arches.png" },
-      { name: "Rocky Mountain", image: "images/RockyMountainNationalPark.png" },
-      { name: "Bryce Canyon", image: "images/BryceCanyon.png" },
-      { name: "Mount Rainier", image: "images/MountRainier.png" }
-    ];
+        <div class="trail-card">
+          <img src="images/glacier.png" alt="Glacier" class="trail-image" />
+          <h2>Glacier</h2>
+        </div>
 
-    const container = document.getElementById("fallback-trails");
+        <div class="trail-card">
+          <img src="images/zion.png" alt="Zion" class="trail-image" />
+          <h2>Zion</h2>
+        </div>
 
-    trails.forEach(trail => {
-      const card = document.createElement("div");
-      card.className = "trail-card";
+        <div class="trail-card">
+          <img src="images/appalachian.png" alt="Appalachian Trail" class="trail-image" />
+          <h2>Appalachian Trail</h2>
+        </div>
 
-      card.innerHTML = `
-        <img src="${trail.image}" alt="${trail.name}">
-        <h3>${trail.name}</h3>
-      `;
+        <div class="trail-card">
+          <img src="images/yosemite.png" alt="Yosemite" class="trail-image" />
+          <h2>Yosemite</h2>
+        </div>
 
-      container.appendChild(card);
-    });
-  </script>
-</body>
+        <div class="trail-card">
+          <img src="images/arches.png" alt="Arches" class="trail-image" />
+          <h2>Arches</h2>
+        </div>
+
+        <div class="trail-card">
+          <img src="images/mountrainier.png" alt="Mount Rainier" class="trail-image" />
+          <h2>Mount Rainier</h2>
+        </div>
+
+        <div class="trail-card">
+          <img src="images/brycecanyon.png" alt="Bryce Canyon" class="trail-image" />
+          <h2>Bryce Canyon</h2>
+        </div>
+
+        <div class="trail-card">
+          <img src="images/rockymountainnationalpark.png" alt="Rocky Mountain" class="trail-image" />
+          <h2>Rocky Mountain</h2>
+        </div>
+      </section>
+    </main>
+  </body>
 </html>
+
 
