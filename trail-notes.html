@@ -3,108 +3,80 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trail Notes</title>
+  <title>Trail Notes – Fallback Trail Cards</title>
   <link rel="stylesheet" href="styles.css" />
-  <style>
-    body {
-      font-family: sans-serif;
-      background-color: #fef9f4;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #5a3a2c;
-      padding: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    header img {
-      height: 50px;
-    }
-    nav a {
-      color: #fff0e0;
-      margin-left: 1rem;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    .container {
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 1rem;
-    }
-    .trail-image {
-      width: 100%;
-      height: auto;
-      max-height: 300px;
-      object-fit: cover;
-      border-radius: 10px;
-      margin-bottom: 1rem;
-    }
-    .not-found {
-      text-align: center;
-      padding: 2rem;
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-  </style>
 </head>
 <body>
   <header>
-    <img src="images/trek4free-logo.png" alt="Trek4Free Logo" />
     <nav>
-      <a href="/index.html">Home</a>
-      <a href="/explore.html">Explore</a>
-      <a href="/top-hikes.html">Top Hikes</a>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="explore.html">Explore</a></li>
+      </ul>
     </nav>
   </header>
 
-  <div class="container" id="trail-content">
-    <!-- Trail details will be injected here -->
-  </div>
+  <main>
+    <section class="fallback-trails">
+      <h1>Fallback Trail Cards</h1>
+      <p>Highlights of the best hiking trails in the United States</p>
 
-  <script>
-    fetch('/data/trail_cards.json')
-      .then((res) => res.json())
-      .then((trails) => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const trailTitle = urlParams.get('trail');
-        const container = document.getElementById('trail-content');
+      <div class="trail-grid">
+        <div class="trail-card">
+          <img src="/images/GrandCanyon.png" alt="Grand Canyon">
+          <p>Grand Canyon</p>
+        </div>
+        <div class="trail-card">
+          <img src="/images/Glacier.png" alt="Glacier">
+          <p>Glacier</p>
+        </div>
+        <div class="trail-card">
+          <img src="/images/Zion.png" alt="Zion">
+          <p>Zion</p>
+        </div>
+        <div class="trail-card">
+          <img src="/images/AppalachianTrail.png" alt="Appalachian Trail">
+          <p>Appalachian Trail</p>
+        </div>
+        <div class="trail-card">
+          <img src="/images/Yosemite.png" alt="Yosemite">
+          <p>Yosemite</p>
+        </div>
+        <div class="trail-card">
+          <img src="/images/Arches.png" alt="Arches">
+          <p>Arches</p>
+        </div>
+        <div class="trail-card">
+          <img src="/images/RockyMountainNationalPark.png" alt="Rocky Mountain National Park">
+          <p>Rocky Mountain National Park</p>
+        </div>
+        <div class="trail-card">
+          <img src="/images/MountRainier.png" alt="Mount Rainier National Park">
+          <p>Mount Rainier National Park</p>
+        </div>
+        <div class="trail-card">
+          <img src="/images/BryceCanyon.png" alt="Bryce Canyon">
+          <p>Bryce Canyon</p>
+        </div>
+        <div class="trail-card">
+          <img src="/images/PacificCrestTrail.png" alt="Pacific Crest Trail">
+          <p>Pacific Crest Trail</p>
+        </div>
+        <div class="trail-card">
+          <img src="/images/JohnMuirTrail.png" alt="John Muir Trail">
+          <p>John Muir Trail</p>
+        </div>
+        <div class="trail-card">
+          <img src="/images/SmokyMountains.png" alt="Smoky Mountains">
+          <p>Smoky Mountains</p>
+        </div>
+      </div>
+    </section>
+  </main>
 
-        const trail = trails.find((t) => t.title === trailTitle);
-
-        if (!trail) {
-          container.innerHTML = `
-            <div class="not-found">
-              <h2>Trail Not Found</h2>
-              <p>Try returning to the map and selecting another trail.</p>
-            </div>
-          `;
-          return;
-        }
-
-        const tags = trail.tags ? trail.tags.join(', ') : 'None';
-        const features = trail.features ? trail.features.join(', ') : 'N/A';
-        const imageUrl = trail.image || '/images/image_placeholder.png';
-
-        container.innerHTML = `
-          <img class="trail-image" src="${imageUrl}" alt="${trail.title}" />
-          <h1>${trail.title}</h1>
-          <p><strong>Location:</strong> ${trail.location}</p>
-          <p><strong>Activity:</strong> ${trail.tags?.[0] || 'N/A'}</p>
-          <p><strong>Difficulty:</strong> ${trail.difficulty}</p>
-          <p><strong>Length:</strong> ${trail.distance}</p>
-          <p><strong>Features:</strong> ${features}</p>
-          <p>${trail.description}</p>
-          <p><em>Tags: ${tags}</em></p>
-        `;
-      })
-      .catch((err) => {
-        document.getElementById('trail-content').innerHTML = `<p>Error loading trail data.</p>`;
-        console.error('JSON load error:', err);
-      });
-  </script>
+  <footer>
+    <p>&copy; 2025 Trek4Free</p>
+  </footer>
 </body>
 </html>
 
