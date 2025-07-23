@@ -1,72 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Trail Notes | Trek4Free</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
-  <header>
-    <div class="container">
-      <a href="index.html">
-        <img src="images/trek4free-logo.png" alt="Trek4Free Logo" class="logo">
+  <header class="site-header">
+    <div class="container header-container">
+      <a href="index.html" class="logo">
+        <img src="images/trek4free-logo.png" alt="Trek4Free Logo" />
       </a>
-      <nav>
-        <ul class="nav-links">
-          <li><a href="index.html" class="btn">Home</a></li>
-          <li><a href="explore.html" class="btn">Explore</a></li>
-          <li><a href="trail-notes.html" class="btn">Trail Notes</a></li>
-        </ul>
+      <nav class="nav-buttons">
+        <a href="index.html" class="btn">Home</a>
+        <a href="explore.html" class="btn">Explore</a>
+        <a href="trail-notes.html" class="btn active">Trail Notes</a>
       </nav>
     </div>
   </header>
 
-  <main>
-    <section class="trail-cards-section">
-      <h2>Top Hiking Trails Across the U.S.</h2>
-      <div class="trail-card-container" id="trailCardContainer">
-        <!-- Trail cards will be dynamically inserted here -->
-      </div>
-    </section>
+  <main class="trail-card-section">
+    <h1>Trail Notes</h1>
+    <div id="trailCardsContainer" class="trail-cards-grid"></div>
   </main>
+
+  <footer class="footer">
+    <p>&copy; 2025 Trek4Free. All rights reserved.</p>
+  </footer>
 
   <script>
     async function loadTrailCards() {
-      const container = document.getElementById('trailCardContainer');
       try {
-        const response = await fetch('data/trail_cards.json');
-        const cards = await response.json();
+        const response = await fetch("data/trail_cards.json");
+        const trails = await response.json();
+        const container = document.getElementById("trailCardsContainer");
 
-        cards.forEach(card => {
-          const cardDiv = document.createElement('div');
-          cardDiv.classList.add('trail-card');
+        trails.forEach(trail => {
+          const card = document.createElement("div");
+          card.className = "trail-card";
 
-          const image = document.createElement('img');
-          image.src = `images/${card.image}`;
-          image.alt = card.title || 'Trail Image';
+          const imgName = trail.title.toLowerCase().replace(/[^a-z0-9]+/g, "").replace(/\s+/g, "") + ".png";
+          const imageUrl = `images/${imgName}`;
 
-          const title = document.createElement('h3');
-          title.textContent = card.title;
+          card.innerHTML = `
+            <img src="${imageUrl}" alt="${trail.title}" onerror="this.onerror=null; this.src='images/image_placeholder.png'" />
+            <div class="trail-content">
+              <h2>${trail.title}</h2>
+              <p><strong>Location:</strong> ${trail.location}</p>
+              <p><strong>Distance:</strong> ${trail.distance}</p>
+              <p><strong>Difficulty:</strong> ${trail.difficulty}</p>
+              <p>${trail.description}</p>
+              <p><strong>Tags:</strong> ${trail.tags.join(", ")}</p>
+            </div>
+          `;
 
-          const description = document.createElement('p');
-          description.textContent = card.description;
-
-          cardDiv.appendChild(image);
-          cardDiv.appendChild(title);
-          cardDiv.appendChild(description);
-
-          container.appendChild(cardDiv);
+          container.appendChild(card);
         });
       } catch (error) {
-        container.innerHTML = '<p>Error loading trail cards. Please try again later.</p>';
-        console.error('Error loading trail cards:', error);
+        console.error("Failed to load trail cards:", error);
       }
     }
 
     loadTrailCards();
   </script>
 </body>
+
 </html>
 
 
