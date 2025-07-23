@@ -1,75 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Trail Notes | Trek4Free</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <header class="navbar">
-      <a href="index.html" class="logo-link">
-        <img src="images/logo.png" alt="Trek4Free logo" class="logo" />
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trail Notes | Trek4Free</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="index.html">
+        <img src="images/trek4free-logo.png" alt="Trek4Free Logo" class="logo">
       </a>
-      <nav class="nav-buttons">
-        <a href="explore.html" class="nav-button">Explore the Map</a>
-        <a href="trail-notes.html" class="nav-button">Trail Notes</a>
-        <a href="#" class="nav-button">Top Hikes in Texas</a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html" class="btn">Home</a></li>
+          <li><a href="explore.html" class="btn">Explore</a></li>
+          <li><a href="trail-notes.html" class="btn">Trail Notes</a></li>
+        </ul>
       </nav>
-    </header>
+    </div>
+  </header>
 
-    <main>
-      <section class="trail-card-container">
-        <h1 class="page-title">Fallback Trail Cards</h1>
-        <p class="subtitle">Highlights of the best hiking trails in the United States</p>
+  <main>
+    <section class="trail-cards-section">
+      <h2>Top Hiking Trails Across the U.S.</h2>
+      <div class="trail-card-container" id="trailCardContainer">
+        <!-- Trail cards will be dynamically inserted here -->
+      </div>
+    </section>
+  </main>
 
-        <div class="trail-card">
-          <img src="images/grandcanyon.png" alt="Grand Canyon" class="trail-image" />
-          <h2>Grand Canyon</h2>
-        </div>
+  <script>
+    async function loadTrailCards() {
+      const container = document.getElementById('trailCardContainer');
+      try {
+        const response = await fetch('data/trail_cards.json');
+        const cards = await response.json();
 
-        <div class="trail-card">
-          <img src="images/glacier.png" alt="Glacier" class="trail-image" />
-          <h2>Glacier</h2>
-        </div>
+        cards.forEach(card => {
+          const cardDiv = document.createElement('div');
+          cardDiv.classList.add('trail-card');
 
-        <div class="trail-card">
-          <img src="images/zion.png" alt="Zion" class="trail-image" />
-          <h2>Zion</h2>
-        </div>
+          const image = document.createElement('img');
+          image.src = `images/${card.image}`;
+          image.alt = card.title || 'Trail Image';
 
-        <div class="trail-card">
-          <img src="images/appalachian.png" alt="Appalachian Trail" class="trail-image" />
-          <h2>Appalachian Trail</h2>
-        </div>
+          const title = document.createElement('h3');
+          title.textContent = card.title;
 
-        <div class="trail-card">
-          <img src="images/yosemite.png" alt="Yosemite" class="trail-image" />
-          <h2>Yosemite</h2>
-        </div>
+          const description = document.createElement('p');
+          description.textContent = card.description;
 
-        <div class="trail-card">
-          <img src="images/arches.png" alt="Arches" class="trail-image" />
-          <h2>Arches</h2>
-        </div>
+          cardDiv.appendChild(image);
+          cardDiv.appendChild(title);
+          cardDiv.appendChild(description);
 
-        <div class="trail-card">
-          <img src="images/mountrainier.png" alt="Mount Rainier" class="trail-image" />
-          <h2>Mount Rainier</h2>
-        </div>
+          container.appendChild(cardDiv);
+        });
+      } catch (error) {
+        container.innerHTML = '<p>Error loading trail cards. Please try again later.</p>';
+        console.error('Error loading trail cards:', error);
+      }
+    }
 
-        <div class="trail-card">
-          <img src="images/brycecanyon.png" alt="Bryce Canyon" class="trail-image" />
-          <h2>Bryce Canyon</h2>
-        </div>
-
-        <div class="trail-card">
-          <img src="images/rockymountainnationalpark.png" alt="Rocky Mountain" class="trail-image" />
-          <h2>Rocky Mountain</h2>
-        </div>
-      </section>
-    </main>
-  </body>
+    loadTrailCards();
+  </script>
+</body>
 </html>
 
 
