@@ -1,12 +1,16 @@
-/* Global Styles */
-body {
+/* Reset some basic elements */
+body, h1, h2, h3, p, ul, li {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
   font-family: 'Raleway', sans-serif;
   background: linear-gradient(to bottom right, #e3dcd2, #c5b9ac);
   color: #3c3c3c;
 }
 
-/* Header */
 header {
   display: flex;
   justify-content: space-between;
@@ -20,10 +24,17 @@ header img {
   height: 50px;
 }
 
-nav a.cta-button {
+nav a {
+  margin-left: 1rem;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+}
+
+.cta-button {
   background-color: #8e735b;
   color: #fff;
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1rem;
   font-size: 1rem;
   border: none;
   border-radius: 6px;
@@ -33,60 +44,62 @@ nav a.cta-button {
   transition: background 0.3s;
 }
 
-nav a.cta-button:hover {
+.cta-button:hover {
   background-color: #6b594a;
 }
 
-/* Trail Card Container */
-.trail-container {
+main {
+  padding: 2rem;
+  text-align: center;
+}
+
+.trail-notes-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 2rem;
-  padding: 2rem;
+  margin-top: 2rem;
 }
 
-/* Individual Trail Card */
 .trail-card {
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: #f8f1ea;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  max-width: 320px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 350px;
   width: 100%;
-  padding: 1.5rem;
+  padding: 1rem;
+  text-align: left;
+}
+
+.trail-card h3 {
+  font-size: 1.25rem;
+  margin: 0.5rem 0;
+}
+
+.trail-card p {
+  font-size: 1rem;
+  margin: 0.25rem 0;
+}
+
+.trail-card .placeholder {
+  background-color: #ddd0c2;
+  width: 100%;
+  height: 200px;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  color: #594a42;
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 8px;
+}
+
+footer {
   text-align: center;
+  padding: 1rem;
+  font-size: 0.85rem;
+  background-color: #eee4db;
+  color: #555;
+  margin-top: 2rem;
 }
-
-.trail-card h2 {
-  margin-top: 0;
-}
-
-.trail-card img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 10px;
-  margin-top: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-/* Responsive Fix */
-@media (max-width: 768px) {
-  header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  nav {
-    margin-top: 1rem;
-  }
-
-  .trail-container {
-    padding: 1rem;
-    gap: 1rem;
-  }
-}
-
 
