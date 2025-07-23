@@ -95,6 +95,13 @@
       box-shadow: 0 0 5px rgba(0,0,0,0.2);
       z-index: 1000;
     }
+    .legend-icon {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
   </style>
 </head>
 <body>
@@ -126,10 +133,10 @@
       </div>
       <div id="legend">
         <strong>Map Legend:</strong><br>
-        <span style="color:green;">●</span> Hiking<br>
-        <span style="color:blue;">●</span> Free Camping<br>
-        <span style="color:deepskyblue;">●</span> Swimming Hole<br>
-        <span style="color:gray;">●</span> Other
+        <span class="legend-icon" style="background-color:green;"></span> Hiking<br>
+        <span class="legend-icon" style="background-color:blue;"></span> Free Camping<br>
+        <span class="legend-icon" style="background-color:deepskyblue;"></span> Swimming Hole<br>
+        <span class="legend-icon" style="background-color:gray;"></span> Other
       </div>
     </div>
   </div>
@@ -137,83 +144,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    const map = L.map('map').setView([37.8, -96], 4);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18,
-    }).addTo(map);
-
-    let markers = [];
-    const categoryMap = {
-      "Hike": "Hiking",
-      "Hiking": "Hiking",
-      "Trail": "Hiking",
-      "Free Camping": "Free Camping",
-      "Camping": "Camping",
-      "Swimming Hole": "Swimming Hole"
-    };
-    const unwantedCategories = ["Fire Tower", "Cultural Site", "Specialized Sport Site"];
-    const validCategories = Object.values(categoryMap).filter((v, i, self) => v && self.indexOf(v) === i);
-    const filterContainer = document.getElementById('popularFilters');
-
-    validCategories.forEach(cat => {
-      const label = document.createElement('label');
-      label.innerHTML = `<input type="checkbox" class="filter-checkbox" value="${cat}" onchange="filterMapPins()"> ${cat}`;
-      filterContainer.appendChild(label);
-    });
-
-    function filterMapPins() {
-      const selectedPopular = Array.from(document.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value);
-      const selectedMore = Array.from(document.querySelectorAll('.more-filter-checkbox:checked')).map(cb => cb.value);
-      const allSelected = selectedPopular.concat(selectedMore);
-      markers.forEach(marker => {
-        const cat = categoryMap[marker.options.category] || marker.options.category;
-        if (allSelected.length === 0) {
-          map.removeLayer(marker);
-        } else if (allSelected.includes(cat)) {
-          marker.addTo(map);
-        } else {
-          map.removeLayer(marker);
-        }
-      });
-    }
-
-    function updateMarkerPopup(marker, data) {
-      const popupContent = `<strong>${data.name}</strong><br>${data.category}<br>${data.notes || ''}`;
-      marker.bindPopup(popupContent);
-    }
-
-    async function fetchData() {
-      try {
-        const response = await fetch('locations.json');
-        const data = await response.json();
-        const resultsContainer = document.getElementById('results');
-        resultsContainer.innerHTML = '';
-        data.forEach(loc => {
-          if (unwantedCategories.includes(loc.category)) return;
-          const cat = categoryMap[loc.category] || loc.category;
-          const color = cat === 'Hiking' ? 'green' : cat === 'Free Camping' ? 'blue' : cat === 'Swimming Hole' ? 'deepskyblue' : 'gray';
-          const marker = L.circleMarker([loc.lat, loc.lon], {
-            radius: 8,
-            fillColor: color,
-            color: "#000",
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.8,
-            category: cat
-          });
-          marker.on('click', () => {
-            resultsContainer.innerHTML = `<div class='location-card'><h4>${loc.name}</h4><p><strong>Category:</strong> ${cat}</p><p>${loc.notes || 'No description available.'}</p></div>`;
-          });
-          markers.push(marker);
-        });
-      } catch (error) {
-        console.error('Failed to load location data:', error);
-      }
-    }
-
-    fetchData();
-  </script>
+  <script src="map-v2.js"></script>
 </body>
 </html>
 
