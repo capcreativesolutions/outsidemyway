@@ -34,14 +34,14 @@ nav a {
 .cta-button {
   background-color: #8e735b;
   color: #fff;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.5rem;
   font-size: 1rem;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   text-decoration: none;
-  margin-left: 1rem;
   transition: background 0.3s;
+  margin-left: 1rem;
 }
 
 .cta-button:hover {
