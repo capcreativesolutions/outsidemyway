@@ -4,68 +4,57 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trail Notes | Trek4Free</title>
+  <title>Trail Notes - Trek4Free</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
-  <header class="site-header">
-    <div class="container header-container">
-      <a href="index.html" class="logo">
-        <img src="images/trek4free-logo.png" alt="Trek4Free Logo" />
-      </a>
-      <nav class="nav-buttons">
-        <a href="index.html" class="btn">Home</a>
-        <a href="explore.html" class="btn">Explore</a>
-        <a href="trail-notes.html" class="btn active">Trail Notes</a>
-      </nav>
-    </div>
+  <header>
+    <img src="images/trek4free-logo.png" alt="Trek4Free Logo" />
+    <nav class="header-buttons">
+      <a href="index.html">Home</a>
+      <a href="explore.html">Explore</a>
+      <a href="trail-notes.html">Trail Notes</a>
+    </nav>
   </header>
 
-  <main class="trail-card-section">
+  <main>
     <h1>Trail Notes</h1>
-    <div id="trailCardsContainer" class="trail-cards-grid"></div>
+    <div class="trail-card-container">
+      <div class="trail-card">
+        <img src="images/image_placeholder.png" alt="Trail Image Placeholder">
+        <h2>Lost Maples State Natural Area - East Trail</h2>
+        <p><strong>Location:</strong> Vanderpool, TX</p>
+        <p><strong>Distance:</strong> 4.6 miles</p>
+        <p><strong>Difficulty:</strong> Moderate</p>
+        <p><strong>Features:</strong> Scenic cliffs, fall foliage, river</p>
+        <p><strong>Last Updated:</strong> 2024-10-05</p>
+      </div>
+
+      <div class="trail-card">
+        <img src="images/image_placeholder.png" alt="Trail Image Placeholder">
+        <h2>Guadalupe River Paddle Trail</h2>
+        <p><strong>Location:</strong> New Braunfels, TX</p>
+        <p><strong>Distance:</strong> 5 miles</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p><strong>Features:</strong> Water recreation, tubing, kayak</p>
+        <p><strong>Last Updated:</strong> 2024-09-20</p>
+      </div>
+
+      <div class="trail-card">
+        <img src="images/image_placeholder.png" alt="Trail Image Placeholder">
+        <h2>Enchanted Rock Summit Trail</h2>
+        <p><strong>Location:</strong> Fredericksburg, TX</p>
+        <p><strong>Distance:</strong> 1.8 miles</p>
+        <p><strong>Difficulty:</strong> Moderate</p>
+        <p><strong>Features:</strong> Pink granite dome, panoramic views</p>
+        <p><strong>Last Updated:</strong> 2024-07-10</p>
+      </div>
+
+      <!-- Additional trail cards can be added here -->
+
+    </div>
   </main>
-
-  <footer class="footer">
-    <p>&copy; 2025 Trek4Free. All rights reserved.</p>
-  </footer>
-
-  <script>
-    async function loadTrailCards() {
-      try {
-        const response = await fetch("data/trail_cards.json");
-        const trails = await response.json();
-        const container = document.getElementById("trailCardsContainer");
-
-        trails.forEach(trail => {
-          const card = document.createElement("div");
-          card.className = "trail-card";
-
-          const imgName = trail.title.toLowerCase().replace(/[^a-z0-9]+/g, "").replace(/\s+/g, "") + ".png";
-          const imageUrl = `images/${imgName}`;
-
-          card.innerHTML = `
-            <img src="${imageUrl}" alt="${trail.title}" onerror="this.onerror=null; this.src='images/image_placeholder.png'" />
-            <div class="trail-content">
-              <h2>${trail.title}</h2>
-              <p><strong>Location:</strong> ${trail.location}</p>
-              <p><strong>Distance:</strong> ${trail.distance}</p>
-              <p><strong>Difficulty:</strong> ${trail.difficulty}</p>
-              <p>${trail.description}</p>
-              <p><strong>Tags:</strong> ${trail.tags.join(", ")}</p>
-            </div>
-          `;
-
-          container.appendChild(card);
-        });
-      } catch (error) {
-        console.error("Failed to load trail cards:", error);
-      }
-    }
-
-    loadTrailCards();
-  </script>
 </body>
 
 </html>
