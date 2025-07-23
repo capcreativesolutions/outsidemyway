@@ -93,6 +93,26 @@ main {
   font-size: 1rem;
   border-radius: 8px;
 }
+.trail-notes-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 2rem;
+}
+.trail-card {
+  width: 300px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 1rem;
+  text-align: center;
+}
+.trail-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
 
 footer {
   text-align: center;
