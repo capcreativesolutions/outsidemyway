@@ -1,62 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Trail Notes - Trek4Free</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
-<header>
-  <img src="/images/trek4free-logo.png" alt="Trek4Free Logo">
-  <nav>
-    <a href="index.html" class="cta-button">Home</a>
-    <a href="explore.html" class="cta-button">Explore the Map</a>
-    <a href="trail-notes.html" class="cta-button">Trail Notes</a>
-  </nav>
-</header>
+  <header>
+    <img src="/images/trek4free-logo.png" alt="Trek4Free Logo">
+    <nav>
+      <a href="index.html" class="cta-button">Home</a>
+      <a href="explore.html" class="cta-button">Explore the Map</a>
+      <a href="trail-notes.html" class="cta-button">Trail Notes</a>
+    </nav>
+  </header>
 
   <main>
     <h1>Trail Notes</h1>
-    <div class="trail-card-container">
-      <div class="trail-card">
-        <img src="images/image_placeholder.png" alt="Trail Image Placeholder">
-        <h2>Lost Maples State Natural Area - East Trail</h2>
-        <p><strong>Location:</strong> Vanderpool, TX</p>
-        <p><strong>Distance:</strong> 4.6 miles</p>
-        <p><strong>Difficulty:</strong> Moderate</p>
-        <p><strong>Features:</strong> Scenic cliffs, fall foliage, river</p>
-        <p><strong>Last Updated:</strong> 2024-10-05</p>
-      </div>
-
-      <div class="trail-card">
-        <img src="images/image_placeholder.png" alt="Trail Image Placeholder">
-        <h2>Guadalupe River Paddle Trail</h2>
-        <p><strong>Location:</strong> New Braunfels, TX</p>
-        <p><strong>Distance:</strong> 5 miles</p>
-        <p><strong>Difficulty:</strong> Easy</p>
-        <p><strong>Features:</strong> Water recreation, tubing, kayak</p>
-        <p><strong>Last Updated:</strong> 2024-09-20</p>
-      </div>
-
-      <div class="trail-card">
-        <img src="images/image_placeholder.png" alt="Trail Image Placeholder">
-        <h2>Enchanted Rock Summit Trail</h2>
-        <p><strong>Location:</strong> Fredericksburg, TX</p>
-        <p><strong>Distance:</strong> 1.8 miles</p>
-        <p><strong>Difficulty:</strong> Moderate</p>
-        <p><strong>Features:</strong> Pink granite dome, panoramic views</p>
-        <p><strong>Last Updated:</strong> 2024-07-10</p>
-      </div>
-
-      <!-- Additional trail cards can be added here -->
-
-    </div>
+    <div class="trail-card-container" id="trailCards"></div>
   </main>
-</body>
 
+  <script>
+    fetch('epic-trails.json')
+      .then(response => response.json())
+      .then(data => {
+        const container = document.getElementById('trailCards');
+        data.trails.forEach(trail => {
+          const card = document.createElement('div');
+          card.className = 'trail-card';
+
+          const img = document.createElement('img');
+          img.src = trail.image || 'images/image_placeholder.png';
+          img.alt = trail.name;
+
+          const title = document.createElement('h2');
+          title.textContent = trail.name;
+
+          const location = document.createElement('p');
+          location.innerHTML = `<strong>Location:</strong> ${trail.location}`;
+
+          const distance = document.createElement('p');
+          distance.innerHTML = `<strong>Distance:</strong> ${trail.distance}`;
+
+          const difficulty = document.createElement('p');
+          difficulty.innerHTML = `<strong>Difficulty:</strong> ${trail.difficulty}`;
+
+          const features = document.createElement('p');
+          features.innerHTML = `<strong>Features:</strong> ${trail.features}`;
+
+          const updated = document.createElement('p');
+          updated.innerHTML = `<strong>Last Updated:</strong> ${trail.updated}`;
+
+          card.appendChild(img);
+          card.appendChild(title);
+          card.appendChild(location);
+          card.appendChild(distance);
+          card.appendChild(difficulty);
+          card.appendChild(features);
+          card.appendChild(updated);
+
+          container.appendChild(card);
+        });
+      })
+      .catch(error => {
+        console.error('Error loading trail data:', error);
+      });
+  </script>
+</body>
 </html>
 
 
