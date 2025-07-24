@@ -1,3 +1,4 @@
+
 // map-v2.js
 
 // Initialize Firebase
@@ -21,16 +22,38 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 const allMarkers = [];
 let currentMarkers = [];
 
-function createMarkerIcon(type) {
-  const iconMap = {
-    "Hiking": "green",
-    "Free Camping": "blue",
-    "Swimming Hole": "deepskyblue",
-    "Other": "gray"
+function createMarkerIcon(typeOrTags) {
+  const colorMap = {
+    "hiking": "green",
+    "camping": "orange",
+    "free camping": "blue",
+    "swimming": "deepskyblue",
+    "visitor center": "purple",
+    "rock climbing": "darkred",
+    "wheelchair accessible": "gold",
+    "dog-friendly": "brown",
+    "picnic area": "olive",
+    "other": "gray"
   };
+
+  let color = "gray";
+
+  // Check if `typeOrTags` is a string or array
+  if (typeof typeOrTags === "string") {
+    color = colorMap[typeOrTags.toLowerCase()] || "gray";
+  } else if (Array.isArray(typeOrTags)) {
+    for (let tag of typeOrTags) {
+      const tagLower = tag.toLowerCase();
+      if (colorMap[tagLower]) {
+        color = colorMap[tagLower];
+        break;
+      }
+    }
+  }
+
   return L.divIcon({
     className: 'custom-icon',
-    html: `<div style="background:${iconMap[type] || 'gray'};width:12px;height:12px;border-radius:50%;"></div>`
+    html: `<div style="background:${color};width:12px;height:12px;border-radius:50%;"></div>`
   });
 }
 
@@ -38,12 +61,15 @@ function renderMapPins(locations) {
   currentMarkers.forEach(marker => map.removeLayer(marker));
   currentMarkers = [];
   locations.forEach(loc => {
-    const marker = L.marker([loc.lat, loc.lng], { icon: createMarkerIcon(loc.type) })
-      .bindPopup(`<strong>${loc.name}</strong><br>${loc.description || ''}`)
-      .addTo(map);
+    const marker = L.marker([loc.lat, loc.lng], {
+      icon: createMarkerIcon(loc.tags.length > 0 ? loc.tags : loc.type)
+    })
+    .bindPopup(`<strong>${loc.name}</strong><br>${loc.description || ''}`)
+    .addTo(map);
     currentMarkers.push(marker);
   });
 }
+
 
 function filterMapPins() {
   const activePopular = Array.from(document.querySelectorAll('.popular-filter-checkbox:checked')).map(cb => cb.value);
