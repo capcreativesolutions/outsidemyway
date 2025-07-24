@@ -1,7 +1,6 @@
+// map-v2.js
 
-// map-v2.js - Trek4Free
-// Handles Firebase data fetching, custom markers, and filtering logic
-
+// Initialize Firebase
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -12,38 +11,80 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const map = L.map('map').setView([37.8, -96], 4);
+
+// Initialize map
+const map = L.map('map').setView([39.5, -98.35], 4);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
-const iconUrls = {
-  Hiking: 'images/markers/hiking.png',
-  Camping: 'images/markers/camping.png',
-  Swimming: 'images/markers/swimming.png',
-  Biking: 'images/markers/biking.png',
-  Climbing: 'images/markers/climbing.png',
-  Default: 'images/markers/default.png'
-};
+const allMarkers = [];
+let currentMarkers = [];
 
-function createMarkerIcon(category) {
-  return L.icon({
-    iconUrl: iconUrls[category] || iconUrls.Default,
-    iconSize: [32, 37],
-    iconAnchor: [16, 37],
-    popupAnchor: [0, -28]
+function createMarkerIcon(type) {
+  const iconMap = {
+    "Hiking": "green",
+    "Free Camping": "blue",
+    "Swimming Hole": "deepskyblue",
+    "Other": "gray"
+  };
+  return L.divIcon({
+    className: 'custom-icon',
+    html: `<div style="background:${iconMap[type] || 'gray'};width:12px;height:12px;border-radius:50%;"></div>`
   });
 }
 
-function loadMapData() {
+function renderMapPins(locations) {
+  currentMarkers.forEach(marker => map.removeLayer(marker));
+  currentMarkers = [];
+  locations.forEach(loc => {
+    const marker = L.marker([loc.lat, loc.lng], { icon: createMarkerIcon(loc.type) })
+      .bindPopup(`<strong>${loc.name}</strong><br>${loc.description || ''}`)
+      .addTo(map);
+    currentMarkers.push(marker);
+  });
+}
+
+function filterMapPins() {
+  const activePopular = Array.from(document.querySelectorAll('.popular-filter-checkbox:checked')).map(cb => cb.value);
+  const activeMore = Array.from(document.querySelectorAll('.more-filter-checkbox:checked')).map(cb => cb.value);
+  let filtered = allMarkers;
+  if (activePopular.length > 0) {
+    filtered = filtered.filter(m => activePopular.includes(m.type));
+  }
+  if (activeMore.length > 0) {
+    filtered = filtered.filter(m => activeMore.some(tag => (m.tags || []).includes(tag)));
+  }
+  renderMapPins(filtered);
+}
+
+function fetchAndDisplayData() {
   db.collection("locations").get().then(snapshot => {
+    allMarkers.length = 0;
     snapshot.forEach(doc => {
       const data = doc.data();
-      const icon = createMarkerIcon(data.category);
-      const marker = L.marker([data.lat, data.lng], { icon }).addTo(map);
-      marker.bindPopup(\`<b>\${data.name}</b><br>\${data.description || ''}\`);
+      allMarkers.push({
+        name: data.name,
+        lat: data.latitude,
+        lng: data.longitude,
+        type: data.type || "Other",
+        description: data.description || "",
+        tags: data.tags || []
+      });
     });
+    renderMapPins(allMarkers);
   });
 }
 
-loadMapData();
+// Add event listeners to filters
+document.querySelectorAll('.popular-filter-checkbox, .more-filter-checkbox')
+  .forEach(el => el.addEventListener('change', filterMapPins));
+
+document.getElementById("search").addEventListener("input", function() {
+  const term = this.value.toLowerCase();
+  const filtered = allMarkers.filter(m => m.name.toLowerCase().includes(term));
+  renderMapPins(filtered);
+});
+
+// Start
+fetchAndDisplayData();
