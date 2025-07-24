@@ -2,12 +2,12 @@
 
 // Initialize Firebase
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBQE3U0lPxLlCF7qcDxo1Pd2qabCXUUtFw",
+  authDomain: "outsidemyway.firebaseapp.com",
+  projectId: "outsidemyway",
+  storageBucket: "outsidemyway.firebasestorage.app",
+  messagingSenderId: "696283600984",
+  appId: "1:696283600984:web:6d1c28e728b2a93108d22d"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
@@ -62,8 +62,8 @@ function renderMapPins(locations) {
     const marker = L.marker([loc.lat, loc.lng], {
       icon: createMarkerIcon(loc.tags.length > 0 ? loc.tags : loc.type)
     })
-    .bindPopup(`<strong>${loc.name}</strong><br>${loc.description || ''}`)
-    .addTo(map);
+      .bindPopup(`<strong>${loc.name}</strong><br>${loc.description || ''}`)
+      .addTo(map);
     currentMarkers.push(marker);
   });
 }
