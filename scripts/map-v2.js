@@ -73,37 +73,37 @@ function filterMapPins() {
   const activeMore = Array.from(document.querySelectorAll('.more-filter-checkbox:checked')).map(cb => cb.value);
   let filtered = allMarkers;
   if (activePopular.length > 0) {
-    filtered = filtered.filter(m => activePopular.includes(m.type));
+    filtered = filtered.filter(m => activePopular.includes(m.type.toLowerCase()));
   }
   if (activeMore.length > 0) {
-    filtered = filtered.filter(m => activeMore.some(tag => (m.tags || []).includes(tag)));
+    filtered = filtered.filter(m => activeMore.some(tag => (m.tags || []).map(t => t.toLowerCase()).includes(tag.toLowerCase())));
   }
   renderMapPins(filtered);
 }
 
 function fetchAndDisplayData() {
+  allMarkers.length = 0; // clear out existing markers before loading
   db.collection("locations").get().then(snapshot => {
-    allMarkers.length = 0;
     snapshot.forEach(doc => {
       const data = doc.data();
       allMarkers.push({
         name: data.name,
         lat: data.latitude,
         lng: data.longitude,
-        type: data.type || "Other",
+        type: (data.type || "other").toLowerCase(),
         description: data.description || "",
-        tags: data.tags || []
+        tags: (data.tags || []).map(t => t.toLowerCase())
       });
     });
-    renderMapPins(allMarkers);
+    renderMapPins([]); // start with no pins displayed
   });
 }
 
 // Add event listeners to filters
-document.querySelectorAll('.popular-filter-checkbox, .more-filter-checkbox')
-  .forEach(el => el.addEventListener('change', filterMapPins));
+const filterCheckboxes = document.querySelectorAll('.popular-filter-checkbox, .more-filter-checkbox');
+filterCheckboxes.forEach(el => el.addEventListener('change', filterMapPins));
 
-document.getElementById("search").addEventListener("input", function() {
+document.getElementById("search").addEventListener("input", function () {
   const term = this.value.toLowerCase();
   const filtered = allMarkers.filter(m => m.name.toLowerCase().includes(term));
   renderMapPins(filtered);
