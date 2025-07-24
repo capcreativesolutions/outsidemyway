@@ -1,4 +1,3 @@
-
 // map-v2.js
 
 // Initialize Firebase
@@ -38,7 +37,6 @@ function createMarkerIcon(typeOrTags) {
 
   let color = "gray";
 
-  // Check if `typeOrTags` is a string or array
   if (typeof typeOrTags === "string") {
     color = colorMap[typeOrTags.toLowerCase()] || "gray";
   } else if (Array.isArray(typeOrTags)) {
@@ -69,7 +67,6 @@ function renderMapPins(locations) {
     currentMarkers.push(marker);
   });
 }
-
 
 function filterMapPins() {
   const activePopular = Array.from(document.querySelectorAll('.popular-filter-checkbox:checked')).map(cb => cb.value);
@@ -114,3 +111,4 @@ document.getElementById("search").addEventListener("input", function() {
 
 // Start
 fetchAndDisplayData();
+
