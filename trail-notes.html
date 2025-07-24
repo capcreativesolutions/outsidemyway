@@ -68,6 +68,36 @@
         console.error('Error loading trail data:', error);
       });
   </script>
+<script>
+  fetch('data/epic-trails.json')
+    .then(response => response.json())
+    .then(data => {
+      const container = document.querySelector('.trail-card-container');
+      container.innerHTML = ''; // Clear existing static cards if any
+
+      data.trails.forEach(trail => {
+        const card = document.createElement('div');
+        card.className = 'trail-card';
+
+        card.innerHTML = `
+          <img src="${trail.image}" alt="${trail.name}" onerror="this.src='images/image_placeholder.png'">
+          <h2>${trail.name}</h2>
+          <p><strong>Location:</strong> ${trail.location}</p>
+          <p><strong>Distance:</strong> ${trail.distance}</p>
+          <p><strong>Difficulty:</strong> ${trail.difficulty}</p>
+          <p><strong>Features:</strong> ${trail.features}</p>
+          <p><strong>Last Updated:</strong> ${trail.updated}</p>
+        `;
+
+        container.appendChild(card);
+      });
+    })
+    .catch(error => {
+      console.error('Error loading trail data:', error);
+    });
+</script>
+
+
 </body>
 </html>
 
