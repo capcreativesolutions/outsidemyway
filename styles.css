@@ -51,7 +51,7 @@ main {
   text-align: center;
 }
 
-.trail-cards-container {
+.trail-card-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
