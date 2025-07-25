@@ -27,8 +27,8 @@ function initMap() {
     }, 500);
   });
 
-  loadMarkersWithinBounds();
   setupFilters();
+  loadMarkersWithinBounds();
 }
 
 function getMapBounds() {
@@ -59,7 +59,7 @@ async function loadMarkersWithinBounds() {
       lng >= bounds.west && lng <= bounds.east &&
       passesFilter(data, filters)
     ) {
-      const marker = L.marker([lat, lng]).bindPopup(`<b>${data.name}</b><br>${data.description || ''}`);
+      const marker = L.circleMarker([lat, lng], getMarkerStyle(data)).bindPopup(`<b>${data.name}</b><br>${data.description || ''}`);
       markersLayer.addLayer(marker);
     }
   });
@@ -82,6 +82,24 @@ function setupFilters() {
   form.addEventListener("change", () => {
     loadMarkersWithinBounds();
   });
+}
+
+function getMarkerStyle(data) {
+  const type = data.type || "other";
+  const colorMap = {
+    "Hiking": "green",
+    "Free Camping": "blue",
+    "Swimming Hole": "cyan",
+    "Other": "gray"
+  };
+  return {
+    radius: 6,
+    fillColor: colorMap[type] || "orange",
+    color: "#000",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+  };
 }
 
 document.addEventListener("DOMContentLoaded", initMap);
