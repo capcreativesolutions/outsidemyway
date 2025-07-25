@@ -1,107 +1,89 @@
 // map-v2.js
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getFirestore, collection, query, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-init.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs, query, where, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// Initialize Firebase
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let map;
-let markersLayer = L.layerGroup();
-let debounceTimer;
+const map = L.map('map').setView([37.8, -96], 4);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 18,
+  attribution: '© OpenStreetMap'
+}).addTo(map);
 
-function initMap() {
-  map = L.map("map").setView([37.8, -96.9], 4);
+const markers = L.layerGroup().addTo(map);
 
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  }).addTo(map);
+function getColorByType(type) {
+  switch (type) {
+    case 'hiking': return 'green';
+    case 'free-camping': return 'blue';
+    case 'swimming': return 'cyan';
+    case 'camping': return 'orange';
+    default: return 'gray';
+  }
+}
 
-  markersLayer.addTo(map);
-  map.on("moveend", () => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      loadMarkersWithinBounds();
-    }, 500);
+function createMarker(doc) {
+  const data = doc.data();
+  const marker = L.circleMarker([data.latitude, data.longitude], {
+    radius: 8,
+    fillColor: getColorByType(data.type),
+    color: '#000',
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
   });
-
-  setupFilters();
-  loadMarkersWithinBounds();
+  marker.bindPopup(`<strong>${data.name}</strong><br>${data.description || ''}`);
+  return marker;
 }
 
-function getMapBounds() {
-  const bounds = map.getBounds();
-  return {
-    north: bounds.getNorth(),
-    south: bounds.getSouth(),
-    east: bounds.getEast(),
-    west: bounds.getWest()
-  };
-}
+async function loadData() {
+  markers.clearLayers();
 
-async function loadMarkersWithinBounds() {
-  const bounds = getMapBounds();
-  const snapshot = await getDocs(collection(db, "locations"));
+  // Get selected filters
+  const form = document.getElementById('filter-form');
+  const selectedTypes = Array.from(form.elements['type'])
+    .filter(el => el.checked)
+    .map(el => el.value);
 
-  const filters = getCurrentFilters();
-
-  markersLayer.clearLayers();
+  let q = query(collection(db, 'locations'), limit(500));
+  const snapshot = await getDocs(q);
 
   snapshot.forEach(doc => {
     const data = doc.data();
-    const lat = data.latitude;
-    const lng = data.longitude;
-
-    if (
-      lat >= bounds.south && lat <= bounds.north &&
-      lng >= bounds.west && lng <= bounds.east &&
-      passesFilter(data, filters)
-    ) {
-      const marker = L.circleMarker([lat, lng], getMarkerStyle(data)).bindPopup(`<b>${data.name}</b><br>${data.description || ''}`);
-      markersLayer.addLayer(marker);
+    if (selectedTypes.length === 0 || selectedTypes.includes(data.type)) {
+      const marker = createMarker(doc);
+      markers.addLayer(marker);
     }
   });
 }
 
-function getCurrentFilters() {
-  const form = document.getElementById("filter-form");
-  const checkboxes = form.querySelectorAll("input[type='checkbox']:checked");
-  return Array.from(checkboxes).map(cb => cb.value);
-}
-
-function passesFilter(data, filters) {
-  if (!filters.length) return true;
-  const tags = data.tags || [];
-  return filters.some(f => tags.includes(f) || data.type === f);
-}
-
-function setupFilters() {
-  const form = document.getElementById("filter-form");
-  form.addEventListener("change", () => {
-    loadMarkersWithinBounds();
+function setupStaticFilters() {
+  const popularFilters = ["free-camping", "camping", "hiking", "swimming"];
+  const container = document.getElementById('popular-filters');
+  popularFilters.forEach(type => {
+    const label = document.createElement('label');
+    label.innerHTML = `<input type="checkbox" name="type" value="${type}" checked> ${type.replace('-', ' ').toUpperCase()}`;
+    container.appendChild(label);
   });
 }
 
-function getMarkerStyle(data) {
-  const type = data.type || "other";
-  const colorMap = {
-    "Hiking": "green",
-    "Free Camping": "blue",
-    "Swimming Hole": "cyan",
-    "Other": "gray"
-  };
-  return {
-    radius: 6,
-    fillColor: colorMap[type] || "orange",
-    color: "#000",
-    weight: 1,
-    opacity: 1,
-    fillOpacity: 0.8
-  };
+function setupFilterListener() {
+  document.getElementById('filter-form').addEventListener('change', loadData);
 }
 
-document.addEventListener("DOMContentLoaded", initMap);
+setupStaticFilters();
+setupFilterListener();
+loadData();
 
 
