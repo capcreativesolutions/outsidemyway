@@ -159,7 +159,56 @@ When completing tasks, document updates in `project-log.md`, then notify user to
 
 /netlify/
 - netlify.toml ✅ Netlify deployment config
+----
+🚫 Why You Shouldn’t Move netlify/functions/ into /scripts/
+netlify/functions/ is a special reserved directory:
+Netlify automatically detects this folder to deploy serverless functions (AWS Lambda). It must remain at the root level (or be explicitly defined in netlify.toml, which you're not doing right now).
 
+Moving it will break your deployment:
+If you move it into /scripts/, Netlify will stop deploying your functions and you'll likely get 404 errors or build failures when trying to access them.
+
+✅ Best Practice
+Here's the correct way to think about it:
+
+💡 scripts/ = Frontend JS for UI and pages
+(e.g., map-handler.js, trail-notes-loader.js)
+
+💡 netlify/functions/ = Backend functions
+(e.g., fetchRIDB.js, process-data.js)
+
+These are two totally different execution environments:
+
+scripts/ runs in the browser.
+
+netlify/functions/ runs on the server via Netlify’s serverless infrastructure.
+
+✅ Recommended Structure
+pgsql
+Copy
+Edit
+/ (root)
+├── css/
+├── data/
+├── images/
+├── js/               ← frontend scripts go here
+│   └── map-handler.js
+├── netlify/
+│   └── functions/    ← Netlify backend functions stay here
+│       └── fetchRIDB.js
+├── index.html
+├── explore.html
+├── trail-notes.html
+└── README.md
+🛠️ Tip
+If you want to improve organization without breaking Netlify:
+
+Keep /netlify/functions/ at root
+
+Create a new /scripts/ folder (already done)
+
+Update the README.md with a note:
+
+"/netlify/functions/ is reserved for Netlify serverless functions and should not be moved or renamed."
 ---
 
 ## ✅ Current Priorities
