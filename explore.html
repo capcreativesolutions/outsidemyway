@@ -3,149 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trek4Free Map Explorer</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      background-color: #f5f1eb;
-    }
-    header {
-      display: flex;
-      align-items: center;
-      background-color: #5d4a3d;
-      padding: 12px 20px;
-      color: white;
-      z-index: 1001;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
-    header img {
-      height: 50px;
-      margin-right: 15px;
-    }
-    header h1 {
-      font-size: 1.8em;
-      margin: 0;
-    }
-    #main {
-      display: flex;
-      flex-direction: row;
-    }
-    #filters {
-      display: flex;
-      flex-direction: column;
-      padding: 12px;
-      width: 260px;
-      background: #f6f1e8;
-      border-right: 1px solid #ccc;
-      z-index: 1000;
-    }
-    .filter-group {
-      margin-bottom: 20px;
-    }
-    .filter-group h3 {
-      margin-bottom: 10px;
-    }
-    .checkbox-list label {
-      display: block;
-      margin-bottom: 6px;
-    }
-    #map {
-      height: 70vh;
-      flex-grow: 1;
-      position: relative;
-      z-index: 1;
-    }
-    #search-container {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      background: white;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-      z-index: 1000;
-    }
-    #results {
-      padding: 10px;
-      background: #f9f9f9;
-      height: 30vh;
-      overflow-y: auto;
-    }
-    .location-card {
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    #legend {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: #ffffffcc;
-      padding: 8px 12px;
-      font-size: 0.85em;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.2);
-      z-index: 1000;
-    }
-    .legend-icon {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      margin-right: 6px;
-    }
-  </style>
+  <title>Explore the Map | Trek4Free</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="icon" href="/images/favicon.ico" />
 </head>
 <body>
   <header>
-    <img src="images/trek4free-logo.png" alt="Trek4Free logo">
-    <h1>Trek4Free Explorer</h1>
+    <img src="/images/trek4free-logo.png" alt="Trek4Free Logo" class="logo" />
+    <nav>
+      <a href="/index.html">Home</a>
+      <a href="/trail-notes.html">Trail Notes</a>
+      <a href="/top-hikes-texas.html">Top Hikes Texas</a>
+    </nav>
   </header>
-  <div id="main">
-    <div id="filters">
-      <div class="filter-group">
-        <h3>Popular Filters</h3>
-        <div class="checkbox-list" id="popularFilters"></div>
-      </div>
-      <div class="filter-group">
-        <h3>More Categories</h3>
-        <div class="checkbox-list" id="moreCategories">
-          <label><input type="checkbox" class="more-filter-checkbox" value="Dog Friendly" onchange="filterMapPins()"> Dog Friendly</label>
-          <label><input type="checkbox" class="more-filter-checkbox" value="Mountain Biking" onchange="filterMapPins()"> Mountain Biking</label>
-          <label><input type="checkbox" class="more-filter-checkbox" value="Rock Climbing" onchange="filterMapPins()"> Rock Climbing</label>
-          <label><input type="checkbox" class="more-filter-checkbox" value="Hiking - Easy" onchange="filterMapPins()"> Hiking - Easy</label>
-          <label><input type="checkbox" class="more-filter-checkbox" value="Hiking - Moderate" onchange="filterMapPins()"> Hiking - Moderate</label>
-          <label><input type="checkbox" class="more-filter-checkbox" value="Hiking - Hard" onchange="filterMapPins()"> Hiking - Hard</label>
-        </div>
-      </div>
-    </div>
-    <div id="map">
-      <div id="search-container">
-        <input type="text" id="search" placeholder="Search name...">
-      </div>
-      <div id="legend">
-        <strong>Map Legend:</strong><br>
-        <span class="legend-icon" style="background-color:green;"></span> Hiking<br>
-        <span class="legend-icon" style="background-color:blue;"></span> Free Camping<br>
-        <span class="legend-icon" style="background-color:deepskyblue;"></span> Swimming Hole<br>
-        <span class="legend-icon" style="background-color:gray;"></span> Other
-      </div>
-    </div>
-  </div>
-  <div id="results"></div>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="scripts/map-v2.js"></script>
+
+  <main>
+    <h1>Explore Free Outdoor Destinations</h1>
+
+    <section id="filter-panel">
+      <h2>Filters</h2>
+      <form id="filter-form">
+        <label><input type="checkbox" name="type" value="free-camping"> Free Camping</label>
+        <label><input type="checkbox" name="type" value="camping"> Camping</label>
+        <label><input type="checkbox" name="type" value="hiking"> Hiking</label>
+        <label><input type="checkbox" name="type" value="swimming"> Swimming Holes</label>
+      </form>
+    </section>
+
+    <div id="map" style="height: 80vh; width: 100%;"></div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Trek4Free</p>
+  </footer>
+
+  <script type="module" src="/scripts/map-v2.js"></script>
 </body>
 </html>
-
 
