@@ -1,0 +1,123 @@
+/* Reset some basic elements */
+body, h1, h2, h3, p, ul, li {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Raleway', sans-serif;
+  background: linear-gradient(to bottom right, #e3dcd2, #c5b9ac);
+  color: #3c3c3c;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #594a42;
+  color: #fff;
+}
+
+header img {
+  height: 50px;
+}
+
+nav a {
+  margin-left: 1rem;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+}
+
+.cta-button {
+      background-color: #8e735b;
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+    .cta-button:hover {
+      background-color: #6b594a;
+    }
+
+main {
+  padding: 2rem;
+  text-align: center;
+}
+
+.trail-card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+  margin-top: 2rem;
+}
+
+.trail-card {
+  background-color: #f8f1ea;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 350px;
+  width: 100%;
+  padding: 1rem;
+  text-align: left;
+}
+
+.trail-card h3 {
+  font-size: 1.25rem;
+  margin: 0.5rem 0;
+}
+
+.trail-card p {
+  font-size: 1rem;
+  margin: 0.25rem 0;
+}
+
+.trail-card .placeholder {
+  background-color: #ddd0c2;
+  width: 100%;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #594a42;
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 8px;
+}
+.trail-notes-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 2rem;
+}
+.trail-card {
+  width: 300px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 1rem;
+  text-align: center;
+}
+.trail-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.85rem;
+  background-color: #eee4db;
+  color: #555;
+  margin-top: 2rem;
+}
