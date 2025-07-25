@@ -2,42 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Explore the Map | Trek4Free</title>
-  <link rel="stylesheet" href="/css/styles.css" />
-  <link rel="icon" href="/images/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trek4Free Explorer</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="icon" href="images/trek4free-favicon.png" />
 </head>
 <body>
   <header>
-    <img src="/images/trek4free-logo.png" alt="Trek4Free Logo" class="logo" />
-    <nav>
-      <a href="/index.html">Home</a>
-      <a href="/trail-notes.html">Trail Notes</a>
-      <a href="/top-hikes-texas.html">Top Hikes Texas</a>
-    </nav>
+    <img src="images/trek4free-logo.png" alt="Trek4Free Logo" class="logo" />
+    <h1>Trek4Free Explorer</h1>
   </header>
 
   <main>
-    <h1>Explore Free Outdoor Destinations</h1>
+    <aside id="sidebar">
+      <section id="filter-panel">
+        <h2>Filters</h2>
+        <form id="filter-form">
+          <h3>Popular Filters</h3>
+          <div id="popular-filters">
+            <!-- Static checkboxes populated by JS -->
+          </div>
 
-    <section id="filter-panel">
-      <h2>Filters</h2>
-      <form id="filter-form">
-        <label><input type="checkbox" name="type" value="free-camping"> Free Camping</label>
-        <label><input type="checkbox" name="type" value="camping"> Camping</label>
-        <label><input type="checkbox" name="type" value="hiking"> Hiking</label>
-        <label><input type="checkbox" name="type" value="swimming"> Swimming Holes</label>
-      </form>
-    </section>
+          <h3>More Categories</h3>
+          <div id="more-categories">
+            <!-- Dynamically injected by JS -->
+          </div>
+        </form>
+      </section>
+    </aside>
 
-    <div id="map" style="height: 80vh; width: 100%;"></div>
+    <div id="map-container">
+      <div id="map"></div>
+      <div id="map-legend">
+        <strong>Map Legend:</strong><br />
+        <span class="legend-color" style="background-color: green;"></span> Hiking<br />
+        <span class="legend-color" style="background-color: blue;"></span> Free Camping<br />
+        <span class="legend-color" style="background-color: cyan;"></span> Swimming Hole<br />
+        <span class="legend-color" style="background-color: orange;"></span> Camping<br />
+        <span class="legend-color" style="background-color: gray;"></span> Other
+      </div>
+      <input type="text" id="search-bar" placeholder="Search name..." />
+    </div>
   </main>
 
-  <footer>
-    <p>&copy; 2025 Trek4Free</p>
-  </footer>
-
-  <script type="module" src="/scripts/map-v2.js"></script>
+  <script type="module" src="map-v2.js"></script>
 </body>
 </html>
-
