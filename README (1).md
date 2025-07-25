@@ -99,3 +99,93 @@ When completing tasks, document updates in `project-log.md`, then notify user to
 🔗 DATABASE: Firebase  
 🔧 VERSION CONTROL: GitHub  
 📄 DOMAIN REGISTRATION: Namecheap
+
+# Trek4Free: Outdoor Activity Explorer
+
+**Trek4Free** is a web app to discover free and low-cost outdoor destinations across the U.S., including campsites, hiking trails, and swimming holes. Our goal is to provide a fast, intuitive, and community-enhanced tool for planning outdoor adventures.
+
+---
+
+## 🛠 Tech Stack
+
+- **Frontend:** HTML, CSS, JavaScript, Leaflet.js
+- **Backend/DB:** Firebase Firestore (currently active; may be hybridized or replaced later with spatial caching via geohash)
+- **Serverless Functions & Caching:** Netlify Functions (future optimization via bounding boxes, regional cache, etc.)
+- **Data Sources:** RIDB API, curated CSV dataset, user submissions, and future AI enrichment (Google, Yelp, AllTrails)
+
+---
+
+## 📁 File & Folder Structure
+
+/  🔹 Root repo (minimal files)
+- /index.html — 🔸 Homepage (branding)
+- /explore.html — 🔸 Map page with filters and Firebase integration
+- /trail-notes.html — 🔸 User note-taking and experience page
+- /top-hikes-texas.html — 🔸 SEO page highlighting curated regional trails
+
+**Folders:**
+
+/css/
+- styles.css ✅ Main site stylesheet
+- trail-notes.css 🔸 Page-specific styles (future option)
+
+/scripts/
+- firebase-init.js ✅ Firebase config (if broken out)
+- map-v2.js ✅ Explore page logic (Firebase map load, filters)
+- filters.js 🔸 Renders checkboxes (future separation)
+- clustering.js 🔸 Marker cluster logic (for performance, if re-integrated)
+- ridb-to-firebase.js ✅ Ingest RIDB data into Firestore (admin-only)
+- agent-verification.js 🔸 AI agent for verifying, flagging, enriching location data (future)
+
+/data/
+- fallback-trails.csv ✅ Static backup trail dataset
+- enriched-locations.csv 🔸 Final enriched data file (optional export)
+- regions.json 🔸 Bounding box or geohash index info (for spatial filtering)
+
+/functions/ (Netlify serverless functions)
+- fetchRIDB.js ✅ Pull data from RIDB API
+- cacheGeoData.js 🔸 Future: serverless layer for bounding box caching
+- enrichLocation.js 🔸 Future: Google/Yelp/AllTrails enrichment & match
+
+/images/
+- *.png, *.jpg, *.svg ✅ All project images
+- hero + card visuals — trek4free-hero.png, fallback card art, logos, etc.
+
+/maps/
+- *.gpx / *.geojson 🔸 For future offline map trail overlays (GPX support possible via Avenza-style export)
+
+/project_logs/
+- project-log.md ✅ Timeline, status, and key changes
+
+/netlify/
+- netlify.toml ✅ Netlify deployment config
+
+---
+
+## ✅ Current Priorities
+
+1. Maintain fast map loading with Firebase while testing serverless caching options (geohash tile indexing).
+2. Clean folder structure as we go. No large refactors until stability proven.
+3. Finish core trail/campsite functionality and filters before expanding SEO content or user accounts.
+4. Avoid duplicate files in root — consolidate anything like hero.png into /images.
+5. Ensure all code references are updated when moving files.
+
+---
+
+## 🤖 Future Paths
+
+- Use OpenAI agents or scheduled Cloud Functions to:
+  - Cross-check existing data with Google Maps, Yelp, AllTrails, Reddit
+  - Flag outdated entries
+  - Auto-enrich descriptions, tags, photos
+  - Add "last_verified" field in metadata
+- Trail maps that load offline (explore GPX download integration or Avenza export format)
+- Lightweight mobile-friendly version of explore.html
+- Admin dashboard for verifying user reports and submissions
+
+---
+
+_Last updated: 2025-07-25_
+
+This README acts as the source of truth across GPT agents and collaborators. Any changes to structure or features should be reflected here first.
+
