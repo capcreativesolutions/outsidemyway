@@ -1,114 +1,89 @@
 // map-v2.js
 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getFirestore, collection, query, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { firebaseConfig } from "./firebase-init.js";
+
 // Initialize Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBQE3U0lPxLlCF7qcDxo1Pd2qabCXUUtFw",
-  authDomain: "outsidemyway.firebaseapp.com",
-  projectId: "outsidemyway",
-  storageBucket: "outsidemyway.firebasestorage.app",
-  messagingSenderId: "696283600984",
-  appId: "1:696283600984:web:6d1c28e728b2a93108d22d"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-// Initialize map
-const map = L.map('map').setView([39.5, -98.35], 4);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors'
-}).addTo(map);
+let map;
+let markersLayer = L.layerGroup();
+let debounceTimer;
 
-const allMarkers = [];
-let currentMarkers = [];
+function initMap() {
+  map = L.map("map").setView([37.8, -96.9], 4);
 
-function createMarkerIcon(typeOrTags) {
-  const colorMap = {
-    "hiking": "green",
-    "camping": "orange",
-    "free camping": "blue",
-    "swimming": "deepskyblue",
-    "visitor center": "purple",
-    "rock climbing": "darkred",
-    "wheelchair accessible": "gold",
-    "dog-friendly": "brown",
-    "picnic area": "olive",
-    "other": "gray"
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  markersLayer.addTo(map);
+  map.on("moveend", () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      loadMarkersWithinBounds();
+    }, 500);
+  });
+
+  loadMarkersWithinBounds();
+  setupFilters();
+}
+
+function getMapBounds() {
+  const bounds = map.getBounds();
+  return {
+    north: bounds.getNorth(),
+    south: bounds.getSouth(),
+    east: bounds.getEast(),
+    west: bounds.getWest()
   };
+}
 
-  let color = "gray";
+async function loadMarkersWithinBounds() {
+  const bounds = getMapBounds();
+  const snapshot = await getDocs(collection(db, "locations"));
 
-  if (typeof typeOrTags === "string") {
-    color = colorMap[typeOrTags.toLowerCase()] || "gray";
-  } else if (Array.isArray(typeOrTags)) {
-    for (let tag of typeOrTags) {
-      const tagLower = tag.toLowerCase();
-      if (colorMap[tagLower]) {
-        color = colorMap[tagLower];
-        break;
-      }
+  const filters = getCurrentFilters();
+
+  markersLayer.clearLayers();
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const lat = data.latitude;
+    const lng = data.longitude;
+
+    if (
+      lat >= bounds.south && lat <= bounds.north &&
+      lng >= bounds.west && lng <= bounds.east &&
+      passesFilter(data, filters)
+    ) {
+      const marker = L.marker([lat, lng]).bindPopup(`<b>${data.name}</b><br>${data.description || ''}`);
+      markersLayer.addLayer(marker);
     }
-  }
-
-  return L.divIcon({
-    className: 'custom-icon',
-    html: `<div style="background:${color};width:12px;height:12px;border-radius:50%;"></div>`
   });
 }
 
-function renderMapPins(locations) {
-  currentMarkers.forEach(marker => map.removeLayer(marker));
-  currentMarkers = [];
-  locations.forEach(loc => {
-    const marker = L.marker([loc.lat, loc.lng], {
-      icon: createMarkerIcon(loc.tags.length > 0 ? loc.tags : loc.type)
-    })
-      .bindPopup(`<strong>${loc.name}</strong><br>${loc.description || ''}`)
-      .addTo(map);
-    currentMarkers.push(marker);
+function getCurrentFilters() {
+  const form = document.getElementById("filter-form");
+  const checkboxes = form.querySelectorAll("input[type='checkbox']:checked");
+  return Array.from(checkboxes).map(cb => cb.value);
+}
+
+function passesFilter(data, filters) {
+  if (!filters.length) return true;
+  const tags = data.tags || [];
+  return filters.some(f => tags.includes(f) || data.type === f);
+}
+
+function setupFilters() {
+  const form = document.getElementById("filter-form");
+  form.addEventListener("change", () => {
+    loadMarkersWithinBounds();
   });
 }
 
-function filterMapPins() {
-  const activePopular = Array.from(document.querySelectorAll('.popular-filter-checkbox:checked')).map(cb => cb.value);
-  const activeMore = Array.from(document.querySelectorAll('.more-filter-checkbox:checked')).map(cb => cb.value);
-  let filtered = allMarkers;
-  if (activePopular.length > 0) {
-    filtered = filtered.filter(m => activePopular.includes(m.type.toLowerCase()));
-  }
-  if (activeMore.length > 0) {
-    filtered = filtered.filter(m => activeMore.some(tag => (m.tags || []).map(t => t.toLowerCase()).includes(tag.toLowerCase())));
-  }
-  renderMapPins(filtered);
-}
+document.addEventListener("DOMContentLoaded", initMap);
 
-function fetchAndDisplayData() {
-  allMarkers.length = 0; // clear out existing markers before loading
-  db.collection("locations").get().then(snapshot => {
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      allMarkers.push({
-        name: data.name,
-        lat: data.latitude,
-        lng: data.longitude,
-        type: (data.type || "other").toLowerCase(),
-        description: data.description || "",
-        tags: (data.tags || []).map(t => t.toLowerCase())
-      });
-    });
-    renderMapPins([]); // start with no pins displayed
-  });
-}
-
-// Add event listeners to filters
-const filterCheckboxes = document.querySelectorAll('.popular-filter-checkbox, .more-filter-checkbox');
-filterCheckboxes.forEach(el => el.addEventListener('change', filterMapPins));
-
-document.getElementById("search").addEventListener("input", function () {
-  const term = this.value.toLowerCase();
-  const filtered = allMarkers.filter(m => m.name.toLowerCase().includes(term));
-  renderMapPins(filtered);
-});
-
-// Start
-fetchAndDisplayData();
 
