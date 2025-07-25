@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Trail Notes - Trek4Free</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 
 <body>
   <header>
-    <img src="/images/trek4free-logo.png" alt="Trek4Free Logo">
+    <img src="images/trek4free-logo.png" alt="Trek4Free Logo">
     <nav>
       <a href="index.html" class="cta-button">Home</a>
       <a href="explore.html" class="cta-button">Explore the Map</a>
@@ -19,21 +19,23 @@
 
   <main>
     <h1>Trail Notes</h1>
-    <div class="trail-card-container" id="trailCards"></div>
+    <div class="trail-card-container" id="trailCardContainer">
+      <!-- Trail cards will be injected here dynamically -->
+    </div>
   </main>
 
   <script>
-    fetch('epic-trails.json')
+    fetch('data/epic-trails.json')
       .then(response => response.json())
       .then(data => {
-        const container = document.getElementById('trailCards');
+        const container = document.getElementById('trailCardContainer');
         data.trails.forEach(trail => {
           const card = document.createElement('div');
-          card.className = 'trail-card';
+          card.classList.add('trail-card');
 
-          const img = document.createElement('img');
-          img.src = trail.image || 'images/image_placeholder.png';
-          img.alt = trail.name;
+          const image = document.createElement('img');
+          image.src = trail.image;
+          image.alt = trail.name;
 
           const title = document.createElement('h2');
           title.textContent = trail.name;
@@ -53,7 +55,7 @@
           const updated = document.createElement('p');
           updated.innerHTML = `<strong>Last Updated:</strong> ${trail.updated}`;
 
-          card.appendChild(img);
+          card.appendChild(image);
           card.appendChild(title);
           card.appendChild(location);
           card.appendChild(distance);
@@ -65,39 +67,10 @@
         });
       })
       .catch(error => {
-        console.error('Error loading trail data:', error);
+        console.error("Error loading trail data:", error);
+        document.getElementById('trailCardContainer').innerHTML = `<p>Error loading trail data.</p>`;
       });
   </script>
-<script>
-  fetch('data/epic-trails.json')
-    .then(response => response.json())
-    .then(data => {
-      const container = document.querySelector('.trail-card-container');
-      container.innerHTML = ''; // Clear existing static cards if any
-
-      data.trails.forEach(trail => {
-        const card = document.createElement('div');
-        card.className = 'trail-card';
-
-        card.innerHTML = `
-          <img src="${trail.image}" alt="${trail.name}" onerror="this.src='images/image_placeholder.png'">
-          <h2>${trail.name}</h2>
-          <p><strong>Location:</strong> ${trail.location}</p>
-          <p><strong>Distance:</strong> ${trail.distance}</p>
-          <p><strong>Difficulty:</strong> ${trail.difficulty}</p>
-          <p><strong>Features:</strong> ${trail.features}</p>
-          <p><strong>Last Updated:</strong> ${trail.updated}</p>
-        `;
-
-        container.appendChild(card);
-      });
-    })
-    .catch(error => {
-      console.error('Error loading trail data:', error);
-    });
-</script>
-
-
 </body>
 </html>
 
