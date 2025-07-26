@@ -1,0 +1,50 @@
+{
+  "trails": [
+    {
+      "name": "Bright Angel Trail - Grand Canyon",
+      "description": "Descend into the Grand Canyon with iconic views and access to the Colorado River.",
+      "difficulty": "Hard",
+      "distance_miles": 9.5,
+      "elevation_gain_ft": 4380,
+      "route_gpx": {
+        "url": "https://example.com/gpx/grandcanyon_brightangel.gpx"
+      },
+      "trailheads": [
+        {
+          "name": "South Rim Trailhead",
+          "lat": 36.057944,
+          "lon": -112.143099
+        }
+      ],
+      "features": [
+        "canyon",
+        "river",
+        "switchbacks"
+      ],
+      "notable_points": [
+        {
+          "type": "viewpoint",
+          "lat": 36.060229,
+          "lon": -112.133123,
+          "name": "Indian Garden"
+        },
+        {
+          "type": "water_source",
+          "lat": 36.071812,
+          "lon": -112.117304,
+          "name": "River Resthouse"
+        }
+      ],
+      "dog_friendly": false,
+      "images": [
+        "https://example.com/images/grandcanyon.png"
+      ],
+      "state": "AZ",
+      "land_type": "National Park",
+      "land_name": "Grand Canyon National Park",
+      "category": "hiking",
+      "source": "manual",
+      "updated": "2025-07-26T00:00:00Z"
+    }
+  ]
+}
