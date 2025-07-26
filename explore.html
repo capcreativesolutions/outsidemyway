@@ -198,7 +198,7 @@ TO DO NEXT:
     }
 
     async function init() {
-      const csv = await fetch("locations.csv").then(r => r.text());
+      const csv = await fetch("data/locations.csv").then(r => r.text());
       const { data } = Papa.parse(csv, { header: true });
       data.forEach(d => addMarker(d, false));
 
