@@ -1,4 +1,4 @@
-## 📘 README.md – Project Structure Overview for Trek4Free
+## 📘 README.md – Project Structure Overview for Trek4Free.
 
 ### 🏕️ Project Purpose
 Trek4Free is a streamlined trip planning tool for outdoor enthusiasts who want to discover hiking, biking, climbing, paddling, and other activities — with **nearby free camping** options.
