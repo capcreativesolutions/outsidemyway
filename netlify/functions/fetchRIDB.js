@@ -1,40 +1,34 @@
-const fetch = require('node-fetch');
+const fetch = require("node-fetch");
 
 exports.handler = async function(event, context) {
-  // Get the RIDB API key from environment variables
-  const RIDB_API_KEY = process.env.RIDB_API_KEY;
+  const API_KEY = process.env.RIDB_API_KEY;
+  const states = ["TX", "NM", "AZ", "UT", "CO", "AR", "MO"]; // add/remove states here
+  const limit = 200;
+  const pagesPerState = 3; // fetch 200 * 3 = 600 per state
+  const allResults = [];
 
-  // Fallback error if environment variable is missing
-  if (!RIDB_API_KEY) {
-    throw new Error("RIDB_API_KEY environment variable is not set.");
-  }
-
-  // Log to Netlify functions console for debugging
-  console.log("RIDB_API_KEY:", RIDB_API_KEY ? "Received ✅" : "Missing ❌");
-
-  const RIDB_ENDPOINT = 'https://ridb.recreation.gov/api/v1/facilities?limit=10';
-
-  try {
-    const response = await fetch(RIDB_ENDPOINT, {
-      headers: {
-        apikey: RIDB_API_KEY
+  for (const state of states) {
+    for (let i = 0; i < pagesPerState; i++) {
+      const offset = i * limit;
+      const url = `https://ridb.recreation.gov/api/v1/facilities?state=${state}&limit=${limit}&offset=${offset}`;
+      try {
+        const res = await fetch(url, {
+          headers: { apikey: API_KEY }
+        });
+        const json = await res.json();
+        if (json.RECDATA && json.RECDATA.length > 0) {
+          allResults.push(...json.RECDATA);
+        } else {
+          break; // stop paging if no more results
+        }
+      } catch (err) {
+        console.error(`Failed to fetch ${state} offset ${offset}`, err);
       }
-    });
-
-    if (!response.ok) {
-      throw new Error(`RIDB request failed: ${response.statusText}`);
     }
-
-    const data = await response.json();
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify(data)
-    };
-  } catch (err) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message })
-    };
   }
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ RECDATA: allResults })
+  };
 };
