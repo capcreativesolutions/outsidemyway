@@ -22,6 +22,8 @@ TO DO NEXT:
 - Create lightweight filter manager to reduce tag clutter
 - Add 'Appalachian Trail' as a new dedicated data layer once provided
 -->
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -58,7 +60,7 @@ TO DO NEXT:
     }
     .map-container {
       margin-left: 240px;
-      height: calc(100vh - 60px);
+      height: calc(100vh - 100px);
     }
     #map {
       width: 100%;
@@ -88,6 +90,31 @@ TO DO NEXT:
       border: none;
       cursor: pointer;
     }
+    #description {
+      height: 40px;
+      background: #e2e2e2;
+      padding: 10px;
+      font-size: 0.85rem;
+      color: #333;
+      margin-left: 240px;
+    }
+    .collapsible {
+      background-color: #eee;
+      color: #333;
+      cursor: pointer;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      text-align: left;
+      outline: none;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    .collapsible-content {
+      padding: 0 10px;
+      display: none;
+      overflow: hidden;
+    }
   </style>
 </head>
 <body>
@@ -102,8 +129,8 @@ TO DO NEXT:
       <label><input type="checkbox" class="filter" value="camping"> Camping</label>
       <label><input type="checkbox" class="filter" value="hiking"> Hiking</label>
       <label><input type="checkbox" class="filter" value="swimming hole"> Swimming Hole</label>
-      <h3>More Categories</h3>
-      <div id="moreFilters"></div>
+      <button class="collapsible">More Categories ▾</button>
+      <div id="moreFilters" class="collapsible-content"></div>
       <div class="search-bar">
         <input type="text" id="searchBox" placeholder="Search name..." />
         <button id="clearFilters">Clear Filters</button>
@@ -114,6 +141,7 @@ TO DO NEXT:
     <div id="map"></div>
     <div id="result" class="popup"></div>
   </div>
+  <div id="description">Explore free and paid outdoor locations including hiking trails, campgrounds, and swimming holes across the U.S.</div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
   <script>
@@ -130,7 +158,7 @@ TO DO NEXT:
     }
 
     function colorFromCategory(tags, isRIDB = false) {
-      if (isRIDB) return "purple"; // temporary color override for RIDB testing
+      if (isRIDB) return "purple";
       const t = tags.join(',').toLowerCase();
       if (t.includes("free")) return "gold";
       if (t.includes("camping")) return "green";
@@ -219,7 +247,15 @@ TO DO NEXT:
       });
     }
 
-    init();
+    document.addEventListener("DOMContentLoaded", () => {
+      init();
+      const coll = document.querySelector(".collapsible");
+      const content = document.querySelector(".collapsible-content");
+      coll.addEventListener("click", function () {
+        this.classList.toggle("active");
+        content.style.display = content.style.display === "block" ? "none" : "block";
+      });
+    });
   </script>
 </body>
 </html>
