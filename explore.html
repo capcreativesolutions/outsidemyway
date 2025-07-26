@@ -32,88 +32,90 @@ TO DO NEXT:
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      display: flex;
-      align-items: center;
-      background-color: #594a42;
-      color: white;
-      padding: 10px;
-    }
-    header img {
-      height: 40px;
-      margin-right: 10px;
-    }
-    .sidebar {
-      width: 240px;
-      padding: 10px;
-      background: #f9f9f9;
-      position: absolute;
-      top: 70px;
-      bottom: 0;
-      overflow-y: auto;
-      z-index: 1000;
-    }
-    .map-container {
-      margin-left: 240px;
-      height: calc(100vh - 100px);
-    }
-    #map {
-      width: 100%;
-      height: 100%;
-    }
-    .filters h3 {
-      margin-top: 0;
-    }
-    .filters label {
-      display: block;
-    }
-    .search-bar {
-      margin-top: 10px;
-    }
-    .popup {
-      font-size: 0.9rem;
-    }
-    .popup a {
-      display: block;
-      margin-top: 5px;
-    }
-    #clearFilters {
-      margin-top: 10px;
-      padding: 5px 10px;
-      background-color: #2e5e34;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    #description {
-      height: 40px;
-      background: #e2e2e2;
-      padding: 10px;
-      font-size: 0.85rem;
-      color: #333;
-      margin-left: 240px;
-    }
-    .collapsible {
-      background-color: #eee;
-      color: #333;
-      cursor: pointer;
-      padding: 10px;
-      width: 100%;
-      border: none;
-      text-align: left;
-      outline: none;
-      font-size: 14px;
-      margin-top: 10px;
-    }
-    .collapsible-content {
-      padding: 0 10px;
-      display: none;
-      overflow: hidden;
-    }
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+header {
+  display: flex;
+  align-items: center;
+  background-color: #4B3621;
+  color: white;
+  padding: 10px;
+}
+header img {
+  height: 40px;
+  margin-right: 10px;
+}
+.sidebar {
+  width: 240px;
+  padding: 20px 10px 10px;
+  background: #f5f0e6;
+  position: absolute;
+  top: 60px;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 1000;
+}
+.map-container {
+  margin-left: 240px;
+  height: calc(100vh - 100px);
+}
+#map {
+  width: 100%;
+  height: 100%;
+}
+.filters h3 {
+  margin-top: 0;
+}
+.filters label {
+  display: block;
+  margin-bottom: 3px;
+}
+.search-bar {
+  margin-top: 10px;
+}
+.popup {
+  font-size: 0.9rem;
+}
+.popup a {
+  display: block;
+  margin-top: 5px;
+}
+#clearFilters {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #4B3621;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+#description {
+  height: 40px;
+  background: #e2e2e2;
+  padding: 10px;
+  font-size: 0.85rem;
+  color: #333;
+  margin-left: 240px;
+}
+.collapsible {
+  background-color: #eee;
+  color: #333;
+  cursor: pointer;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 14px;
+  margin-top: 10px;
+}
+.collapsible-content {
+  padding: 0 10px;
+  display: none;
+  overflow: hidden;
+}
+
   </style>
 </head>
 <body>
