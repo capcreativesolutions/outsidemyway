@@ -1,50 +1,225 @@
+<!--
+PROJECT NOTES (DO NOT DELETE)
+
+TASKS IN PROGRESS:
+- Front-end integration of RIDB API and local CSV data ✅
+- Dynamic filters from category tags ✅
+- Color-coded pins for: Free Camping (gold), Camping (green), Hiking (blue), Other (crimson) ✅
+- Google Maps directions links in popups ✅
+- Category filters auto-generated from both RIDB + CSV ✅
+- Suppression of irrelevant RIDB tags (e.g., "Cultural", "Interpretive Programs") ✅
+- Popup display method preferred over bottom pane ✅
+- Normalized tag filtering (handles comma-separated values correctly) ✅
+- Filtering by name (case-insensitive substring match) ✅
+- Fuzzy filtering logic (e.g., 'hike' matches 'hiking') ✅
+- RIDB markers temporarily styled in purple for visual verification ✅
+- Clear Filters button added ✅
+
+TO DO NEXT:
+- Restore persistent result pane if user requests it
+- Implement loading indicator or error message for RIDB failure
+- Optional toggle between RIDB-only, CSV-only, or combined view
+- Create lightweight filter manager to reduce tag clutter
+- Add 'Appalachian Trail' as a new dedicated data layer once provided
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Trek4Free Explorer</title>
-  <link rel="stylesheet" href="styles.css"/>
-  <link rel="icon" href="images/trek4free-favicon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Outside My Way</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      background-color: #2e5e34;
+      color: white;
+      padding: 10px;
+    }
+    header img {
+      height: 40px;
+      margin-right: 10px;
+    }
+    .sidebar {
+      width: 240px;
+      padding: 10px;
+      background: #f9f9f9;
+      position: absolute;
+      top: 60px;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 1000;
+    }
+    .map-container {
+      margin-left: 240px;
+      height: calc(100vh - 60px);
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+    .filters h3 {
+      margin-top: 0;
+    }
+    .filters label {
+      display: block;
+    }
+    .search-bar {
+      margin-top: 10px;
+    }
+    .popup {
+      font-size: 0.9rem;
+    }
+    .popup a {
+      display: block;
+      margin-top: 5px;
+    }
+    #clearFilters {
+      margin-top: 10px;
+      padding: 5px 10px;
+      background-color: #2e5e34;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <header>
-    <img src="images/trek4free-logo.png" alt="Trek4Free Logo" class="logo" />
-    <h1>Trek4Free Explorer</h1>
+    <img src="logo.png" alt="Outside My Way logo" />
+    <h1>Outside My Way</h1>
   </header>
-
-  <main>
-    <aside id="sidebar">
-      <section id="filter-panel">
-        <h2>Filters</h2>
-        <form id="filter-form">
-          <h3>Popular Filters</h3>
-          <div id="popular-filters">
-            <!-- Static checkboxes populated by JS -->
-          </div>
-
-          <h3>More Categories</h3>
-          <div id="more-categories">
-            <!-- Dynamically injected by JS -->
-          </div>
-        </form>
-      </section>
-    </aside>
-
-    <div id="map-container">
-      <div id="map"></div>
-      <div id="map-legend">
-        <strong>Map Legend:</strong><br />
-        <span class="legend-color" style="background-color: green;"></span> Hiking<br />
-        <span class="legend-color" style="background-color: blue;"></span> Free Camping<br />
-        <span class="legend-color" style="background-color: cyan;"></span> Swimming Hole<br />
-        <span class="legend-color" style="background-color: orange;"></span> Camping<br />
-        <span class="legend-color" style="background-color: gray;"></span> Other
+  <div class="sidebar">
+    <div class="filters">
+      <h3>Popular Filters</h3>
+      <label><input type="checkbox" class="filter" value="free camping"> Free Camping</label>
+      <label><input type="checkbox" class="filter" value="camping"> Camping</label>
+      <label><input type="checkbox" class="filter" value="hiking"> Hiking</label>
+      <label><input type="checkbox" class="filter" value="swimming hole"> Swimming Hole</label>
+      <h3>More Categories</h3>
+      <div id="moreFilters"></div>
+      <div class="search-bar">
+        <input type="text" id="searchBox" placeholder="Search name..." />
+        <button id="clearFilters">Clear Filters</button>
       </div>
-      <input type="text" id="search-bar" placeholder="Search name..." />
     </div>
-  </main>
+  </div>
+  <div class="map-container">
+    <div id="map"></div>
+    <div id="result" class="popup"></div>
+  </div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  <script>
+    const map = L.map('map').setView([31.5, -99.5], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
 
-  <script type="module" src="map-v2.js"></script>
+    const markers = [];
+    const uniqueTags = new Set();
+
+    function normalizeTags(tagString) {
+      return tagString.split(',').map(tag => tag.trim().toLowerCase()).filter(Boolean);
+    }
+
+    function colorFromCategory(tags, isRIDB = false) {
+      if (isRIDB) return "purple"; // temporary color override for RIDB testing
+      const t = tags.join(',').toLowerCase();
+      if (t.includes("free")) return "gold";
+      if (t.includes("camping")) return "green";
+      if (t.includes("hiking") || t.includes("trail")) return "blue";
+      return "crimson";
+    }
+
+    function addMarker(d, isRIDB = false) {
+      const lat = parseFloat(d.latitude || d.FacilityLatitude);
+      const lon = parseFloat(d.longitude || d.FacilityLongitude);
+      if (!lat || !lon) return;
+
+      const name = d.name || d.FacilityName || "Unnamed Location";
+      const desc = d.description || d.FacilityDescription || "";
+      const rawTags = d.category || d.FacilityKeywords || "";
+      const tags = normalizeTags(rawTags);
+      const color = colorFromCategory(tags, isRIDB);
+
+      tags.forEach(t => uniqueTags.add(t));
+
+      const marker = L.circleMarker([lat, lon], {
+        radius: 8,
+        fillColor: color,
+        color: '#000',
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+      }).addTo(map);
+
+      const link = `https://www.google.com/maps?q=${lat},${lon}`;
+
+      marker.bindPopup(`<strong>${name}</strong><br><em>${tags.join(', ')}</em><br>${desc}<br><a href='${link}' target='_blank'>Navigate with Google Maps</a>`);
+      marker.name = name.toLowerCase();
+      marker.tags = tags;
+      markers.push(marker);
+    }
+
+    function applyFilters() {
+      const checkboxes = document.querySelectorAll('.filter:checked');
+      const query = document.getElementById('searchBox').value.toLowerCase();
+      const selected = Array.from(checkboxes).map(cb => cb.value.toLowerCase());
+
+      markers.forEach(m => {
+        const tagMatch = selected.length === 0 || selected.some(filterTag =>
+          m.tags.some(markerTag => markerTag.includes(filterTag) || filterTag.includes(markerTag))
+        );
+        const nameMatch = m.name.includes(query);
+        if (tagMatch && nameMatch) {
+          map.addLayer(m);
+        } else {
+          map.removeLayer(m);
+        }
+      });
+    }
+
+    function addDynamicFilters() {
+      const container = document.getElementById("moreFilters");
+      Array.from(uniqueTags).sort().forEach(tag => {
+        const t = tag.trim().toLowerCase();
+        if (["cultural", "visitor center", "interpretive programs", "picnicking", "specialized sport site", "playground park", "fire lookouts"].includes(t)) return;
+        const label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" class="filter" value="${t}"> ${t.charAt(0).toUpperCase() + t.slice(1)}`;
+        container.appendChild(label);
+      });
+    }
+
+    async function init() {
+      const csv = await fetch("locations.csv").then(r => r.text());
+      const { data } = Papa.parse(csv, { header: true });
+      data.forEach(d => addMarker(d, false));
+
+      try {
+        const ridb = await fetch("/.netlify/functions/fetchRIDB").then(r => r.json());
+        (ridb.RECDATA || []).forEach(d => addMarker(d, true));
+      } catch (e) {
+        console.warn("RIDB fetch failed", e);
+      }
+
+      addDynamicFilters();
+      document.querySelectorAll('.filter').forEach(cb => cb.addEventListener("change", applyFilters));
+      document.getElementById("searchBox").addEventListener("input", applyFilters);
+      document.getElementById("clearFilters").addEventListener("click", () => {
+        document.querySelectorAll(".filter").forEach(cb => cb.checked = false);
+        document.getElementById("searchBox").value = "";
+        applyFilters();
+      });
+    }
+
+    init();
+  </script>
 </body>
 </html>
