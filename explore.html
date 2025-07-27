@@ -1,23 +1,26 @@
+<!-- Explore.html Fully Functional -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trek4Free | Adventure Starts Here</title>
+  <title>Trek4Free | Explore the Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     html, body { margin: 0; padding: 0; height: 100%; font-family: Arial, sans-serif; }
-    header { display: flex; align-items: center; background-color: #594a42; color: white; padding: 10px; height: 60px; z-index: 1001; }
+    header { display: flex; align-items: center; background-color: #594a42; color: white; padding: 10px; height: 60px; }
     header img { height: 40px; margin-right: 10px; }
     main { display: flex; height: calc(100vh - 100px); }
-    nav.sidebar { width: 240px; padding: 10px; background: #f9f9f9; overflow-y: auto; }
+    nav.sidebar { width: 260px; padding: 10px; background: #f9f9f9; overflow-y: auto; }
     section.map-container { flex: 1; position: relative; }
     #map { width: 100%; height: 100%; }
+    #description { background: #e2e2e2; padding: 10px; font-size: 0.85rem; color: #333; text-align: center; }
     .search-bar { margin-bottom: 10px; }
-    .filters h3 { margin: 0; }
+    .filters h3 { margin: 0 0 10px 0; }
     .filters label { display: block; }
     #clearFilters { margin-top: 10px; padding: 5px 10px; background-color: #2e5e34; color: white; border: none; cursor: pointer; }
-    #description { background: #e2e2e2; padding: 10px; font-size: 0.85rem; color: #333; text-align: center; }
+    .collapsible { background-color: #eee; color: #333; cursor: pointer; padding: 10px; width: 100%; border: none; text-align: left; font-size: 14px; margin-top: 10px; }
+    .collapsible-content { padding: 0 10px; display: none; overflow: hidden; }
   </style>
 </head>
 <body>
@@ -25,7 +28,7 @@
     <img src="images/trek4free-logo.png" alt="Trek4Free logo" />
     <h1>Trek4Free</h1>
   </header>
-  <div id="description">Explore free and paid outdoor locations including hiking trails, campgrounds, and swimming holes across the U.S.</div>
+  <div id="description">Select filters to explore free and paid outdoor locations including trails, campsites, and access points.</div>
   <main>
     <nav class="sidebar" aria-label="Map Filters">
       <div class="search-bar" role="search">
@@ -38,6 +41,8 @@
         <label><input type="checkbox" class="filter" value="camping"> Camping</label>
         <label><input type="checkbox" class="filter" value="hiking"> Hiking</label>
         <label><input type="checkbox" class="filter" value="swimming hole"> Swimming Hole</label>
+        <button class="collapsible">Show More Categories ▾</button>
+        <div id="moreFilters" class="collapsible-content"></div>
       </div>
     </nav>
     <section class="map-container">
@@ -45,69 +50,111 @@
     </section>
   </main>
 
-  <!-- 📜 Scripts -->
+  <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
   <script>
-    // Initialize map
-    const map = L.map('map').setView([39.5, -98.35], 4); // Centered over US
-
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
+    const map = L.map("map").setView([39.5, -98.35], 5);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap contributors",
     }).addTo(map);
 
-    // Load CSV data
-    async function loadData() {
-      const csv = await fetch("./data/locations.csv").then(r => r.text());
-      const parsed = Papa.parse(csv, { header: true, skipEmptyLines: true });
-      const data = parsed.data;
+    let allMarkers = [];
+    const uniqueTags = new Set();
 
-      data.forEach(loc => {
-        if (!loc.latitude || !loc.longitude) return;
-        const marker = L.marker([+loc.latitude, +loc.longitude]).addTo(map);
-        marker.bindPopup(`<b>${loc.name}</b><br>${loc.description || ''}`);
-        marker.category = loc.category?.toLowerCase() || '';
-        marker.name = loc.name?.toLowerCase() || '';
-        marker._original = marker.getLatLng(); // For future reference
-      });
-
-      setupFiltering(data);
+    function normalizeTags(tagString) {
+      return tagString.split(",").map(tag => tag.trim().toLowerCase()).filter(Boolean);
     }
 
-    // Setup filtering
-    function setupFiltering(data) {
-      const filters = document.querySelectorAll('.filter');
-      const searchBox = document.getElementById('searchBox');
-      const clearBtn = document.getElementById('clearFilters');
+    function colorFromTags(tags, isRIDB = false) {
+      if (isRIDB) return "purple";
+      const t = tags.join(",").toLowerCase();
+      if (t.includes("free")) return "gold";
+      if (t.includes("camping")) return "green";
+      if (t.includes("hiking") || t.includes("trail")) return "blue";
+      return "crimson";
+    }
 
-      function updateMarkers() {
-        const activeFilters = [...filters].filter(f => f.checked).map(f => f.value.toLowerCase());
-        const searchTerm = searchBox.value.trim().toLowerCase();
+    function addMarker(data, isRIDB = false) {
+      const lat = parseFloat(data.latitude || data.FacilityLatitude);
+      const lon = parseFloat(data.longitude || data.FacilityLongitude);
+      if (!lat || !lon) return;
 
-        map.eachLayer(layer => {
-          if (layer instanceof L.Marker) {
-            const matchesFilter = !activeFilters.length || activeFilters.some(f => layer.category.includes(f));
-            const matchesSearch = !searchTerm || layer.name.includes(searchTerm);
-            if (matchesFilter && matchesSearch) {
-              layer.addTo(map);
-            } else {
-              map.removeLayer(layer);
-            }
-          }
-        });
+      const name = data.name || data.FacilityName || "Unnamed Location";
+      const desc = data.description || data.FacilityDescription || "";
+      const rawTags = data.category || data.FacilityKeywords || "";
+      const tags = normalizeTags(rawTags);
+      const color = colorFromTags(tags, isRIDB);
+
+      tags.forEach(t => uniqueTags.add(t));
+
+      const marker = L.circleMarker([lat, lon], {
+        radius: 8,
+        fillColor: color,
+        color: "#000",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8,
+      });
+
+      const link = `https://www.google.com/maps?q=${lat},${lon}`;
+      marker.bindPopup(`<strong>${name}</strong><br><em>${tags.join(", ")}</em><br>${desc}<br><a href="${link}" target="_blank">Navigate with Google Maps</a>`);
+      marker.name = name.toLowerCase();
+      marker.tags = tags;
+      allMarkers.push(marker);
+    }
+
+    function applyFilters() {
+      const selectedTags = Array.from(document.querySelectorAll(".filter:checked")).map(cb => cb.value.toLowerCase());
+      const query = document.getElementById("searchBox").value.trim().toLowerCase();
+
+      // Remove all markers first
+      allMarkers.forEach(m => map.removeLayer(m));
+
+      // If no filters and no search, don't show anything
+      if (selectedTags.length === 0 && query === "") return;
+
+      // Add matching markers
+      allMarkers.forEach(m => {
+        const tagMatch = selectedTags.length === 0 || selectedTags.some(filter => m.tags.includes(filter));
+        const nameMatch = m.name.includes(query);
+        if (tagMatch && nameMatch) m.addTo(map);
+      });
+    }
+
+    function addDynamicFilters() {
+      const container = document.getElementById("moreFilters");
+      Array.from(uniqueTags).sort().forEach(tag => {
+        const skipTags = ["cultural", "visitor center", "interpretive programs", "picnicking", "specialized sport site", "playground park", "fire lookouts"];
+        if (skipTags.includes(tag)) return;
+        const label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" class="filter" value="${tag}"> ${tag.charAt(0).toUpperCase() + tag.slice(1)}`;
+        container.appendChild(label);
+      });
+    }
+
+    async function init() {
+      const csvText = await fetch("./data/locations.csv").then(r => r.text());
+      const parsedCSV = Papa.parse(csvText, { header: true });
+      parsedCSV.data.forEach(row => addMarker(row, false));
+
+      // RIDB fallback
+      try {
+        const ridb = await fetch("/.netlify/functions/fetchRIDB").then(r => r.json());
+        (ridb.RECDATA || []).forEach(entry => addMarker(entry, true));
+      } catch (e) {
+        console.warn("RIDB fetch failed:", e);
       }
 
-      filters.forEach(f => f.addEventListener('change', updateMarkers));
-      searchBox.addEventListener('input', updateMarkers);
-      clearBtn.addEventListener('click', () => {
-        filters.forEach(f => f.checked = false);
-        searchBox.value = '';
-        updateMarkers();
+      addDynamicFilters();
+      document.querySelectorAll(".filter").forEach(cb => cb.addEventListener("change", applyFilters));
+      document.getElementById("searchBox").addEventListener("input", applyFilters);
+      document.getElementById("clearFilters").addEventListener("click", () => {
+        document.querySelectorAll(".filter").forEach(cb => cb.checked = false);
+        document.getElementById("searchBox").value = "";
+        applyFilters();
       });
-    }
 
-    loadData();
-  </script>
-</body>
-</html>
-
+      const coll = document.querySelector(".collapsible");
+      const content = document.querySelector(".collapsible-content");
+      coll.addEventListener("click", function
