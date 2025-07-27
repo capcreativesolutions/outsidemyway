@@ -1,4 +1,3 @@
-<!-- Explore.html Fully Functional -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,20 +6,82 @@
   <title>Trek4Free | Explore the Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    html, body { margin: 0; padding: 0; height: 100%; font-family: Arial, sans-serif; }
-    header { display: flex; align-items: center; background-color: #594a42; color: white; padding: 10px; height: 60px; }
-    header img { height: 40px; margin-right: 10px; }
-    main { display: flex; height: calc(100vh - 100px); }
-    nav.sidebar { width: 260px; padding: 10px; background: #f9f9f9; overflow-y: auto; }
-    section.map-container { flex: 1; position: relative; }
-    #map { width: 100%; height: 100%; }
-    #description { background: #e2e2e2; padding: 10px; font-size: 0.85rem; color: #333; text-align: center; }
-    .search-bar { margin-bottom: 10px; }
-    .filters h3 { margin: 0 0 10px 0; }
-    .filters label { display: block; }
-    #clearFilters { margin-top: 10px; padding: 5px 10px; background-color: #2e5e34; color: white; border: none; cursor: pointer; }
-    .collapsible { background-color: #eee; color: #333; cursor: pointer; padding: 10px; width: 100%; border: none; text-align: left; font-size: 14px; margin-top: 10px; }
-    .collapsible-content { padding: 0 10px; display: none; overflow: hidden; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      background-color: #594a42;
+      color: white;
+      padding: 10px;
+      height: 60px;
+    }
+    header img {
+      height: 40px;
+      margin-right: 10px;
+    }
+    #description {
+      background: #e2e2e2;
+      padding: 10px;
+      font-size: 0.85rem;
+      color: #333;
+      text-align: center;
+    }
+    main {
+      display: flex;
+      height: calc(100vh - 100px);
+    }
+    nav.sidebar {
+      width: 260px;
+      padding: 10px;
+      background: #f9f9f9;
+      overflow-y: auto;
+    }
+    section.map-container {
+      flex: 1;
+      position: relative;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+    .search-bar {
+      margin-bottom: 10px;
+    }
+    .filters h3 {
+      margin: 0 0 10px;
+    }
+    .filters label {
+      display: block;
+    }
+    #clearFilters {
+      margin-top: 10px;
+      padding: 5px 10px;
+      background-color: #2e5e34;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .collapsible {
+      background-color: #eee;
+      color: #333;
+      cursor: pointer;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      text-align: left;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    .collapsible-content {
+      padding: 0 10px;
+      display: none;
+      overflow: hidden;
+    }
   </style>
 </head>
 <body>
@@ -28,11 +89,13 @@
     <img src="images/trek4free-logo.png" alt="Trek4Free logo" />
     <h1>Trek4Free</h1>
   </header>
-  <div id="description">Select filters to explore free and paid outdoor locations including trails, campsites, and access points.</div>
+  <div id="description">
+    Select filters to explore free and paid outdoor locations including trails, campsites, and access points.
+  </div>
   <main>
     <nav class="sidebar" aria-label="Map Filters">
-      <div class="search-bar" role="search">
-        <input type="text" id="searchBox" placeholder="Search name..." aria-label="Search by name" />
+      <div class="search-bar">
+        <input type="text" id="searchBox" placeholder="Search name..." />
         <button id="clearFilters">Clear Filters</button>
       </div>
       <div class="filters">
@@ -50,13 +113,12 @@
     </section>
   </main>
 
-  <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
   <script>
     const map = L.map("map").setView([39.5, -98.35], 5);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "© OpenStreetMap contributors",
+      attribution: "© OpenStreetMap contributors"
     }).addTo(map);
 
     let allMarkers = [];
@@ -94,7 +156,7 @@
         color: "#000",
         weight: 1,
         opacity: 1,
-        fillOpacity: 0.8,
+        fillOpacity: 0.8
       });
 
       const link = `https://www.google.com/maps?q=${lat},${lon}`;
@@ -108,13 +170,10 @@
       const selectedTags = Array.from(document.querySelectorAll(".filter:checked")).map(cb => cb.value.toLowerCase());
       const query = document.getElementById("searchBox").value.trim().toLowerCase();
 
-      // Remove all markers first
       allMarkers.forEach(m => map.removeLayer(m));
 
-      // If no filters and no search, don't show anything
       if (selectedTags.length === 0 && query === "") return;
 
-      // Add matching markers
       allMarkers.forEach(m => {
         const tagMatch = selectedTags.length === 0 || selectedTags.some(filter => m.tags.includes(filter));
         const nameMatch = m.name.includes(query);
@@ -138,7 +197,6 @@
       const parsedCSV = Papa.parse(csvText, { header: true });
       parsedCSV.data.forEach(row => addMarker(row, false));
 
-      // RIDB fallback
       try {
         const ridb = await fetch("/.netlify/functions/fetchRIDB").then(r => r.json());
         (ridb.RECDATA || []).forEach(entry => addMarker(entry, true));
@@ -157,4 +215,8 @@
 
       const coll = document.querySelector(".collapsible");
       const content = document.querySelector(".collapsible-content");
-      coll.addEventListener("click", function
+      coll.addEventListener("click", function () {
+        this.classList.toggle("active");
+        content.style.display = content.style.display === "block" ? "none" : "block";
+      });
+   
