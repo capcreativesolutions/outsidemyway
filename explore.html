@@ -1,4 +1,3 @@
-<!-- ✂️ Cleaned Up version of explore.html begins below -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,84 +6,18 @@
   <title>Trek4Free | Adventure Starts Here</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      font-family: Arial, sans-serif;
-    }
-    header {
-      display: flex;
-      align-items: center;
-      background-color: #594a42;
-      color: white;
-      padding: 10px;
-      height: 60px;
-      z-index: 1001;
-    }
-    header img {
-      height: 40px;
-      margin-right: 10px;
-    }
-    main {
-      display: flex;
-      height: calc(100vh - 100px);
-    }
-    nav.sidebar {
-      width: 240px;
-      padding: 10px;
-      background: #f9f9f9;
-      overflow-y: auto;
-    }
-    section.map-container {
-      flex: 1;
-      position: relative;
-    }
-    #map {
-      width: 100%;
-      height: 100%;
-    }
-    .search-bar {
-      margin-bottom: 10px;
-    }
-    .filters h3 {
-      margin: 0;
-    }
-    .filters label {
-      display: block;
-    }
-    #clearFilters {
-      margin-top: 10px;
-      padding: 5px 10px;
-      background-color: #2e5e34;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    #description {
-      background: #e2e2e2;
-      padding: 10px;
-      font-size: 0.85rem;
-      color: #333;
-      text-align: center;
-    }
-    .collapsible {
-      background-color: #eee;
-      color: #333;
-      cursor: pointer;
-      padding: 10px;
-      width: 100%;
-      border: none;
-      text-align: left;
-      outline: none;
-      font-size: 14px;
-      margin-top: 10px;
-    }
-    .collapsible-content {
-      padding: 0 10px;
-      display: none;
-      overflow: hidden;
-    }
+    html, body { margin: 0; padding: 0; height: 100%; font-family: Arial, sans-serif; }
+    header { display: flex; align-items: center; background-color: #594a42; color: white; padding: 10px; height: 60px; z-index: 1001; }
+    header img { height: 40px; margin-right: 10px; }
+    main { display: flex; height: calc(100vh - 100px); }
+    nav.sidebar { width: 240px; padding: 10px; background: #f9f9f9; overflow-y: auto; }
+    section.map-container { flex: 1; position: relative; }
+    #map { width: 100%; height: 100%; }
+    .search-bar { margin-bottom: 10px; }
+    .filters h3 { margin: 0; }
+    .filters label { display: block; }
+    #clearFilters { margin-top: 10px; padding: 5px 10px; background-color: #2e5e34; color: white; border: none; cursor: pointer; }
+    #description { background: #e2e2e2; padding: 10px; font-size: 0.85rem; color: #333; text-align: center; }
   </style>
 </head>
 <body>
@@ -105,8 +38,6 @@
         <label><input type="checkbox" class="filter" value="camping"> Camping</label>
         <label><input type="checkbox" class="filter" value="hiking"> Hiking</label>
         <label><input type="checkbox" class="filter" value="swimming hole"> Swimming Hole</label>
-        <button class="collapsible">Show More Categories ▾</button>
-        <div id="moreFilters" class="collapsible-content"></div>
       </div>
     </nav>
     <section class="map-container">
@@ -114,11 +45,68 @@
     </section>
   </main>
 
-  <!-- Your original <script> remains unchanged -->
+  <!-- 📜 Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.1/papaparse.min.js"></script>
   <script>
-    // your JS content unchanged here…
+    // Initialize map
+    const map = L.map('map').setView([39.5, -98.35], 4); // Centered over US
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // Load CSV data
+    async function loadData() {
+      const csv = await fetch("./data/locations.csv").then(r => r.text());
+      const parsed = Papa.parse(csv, { header: true, skipEmptyLines: true });
+      const data = parsed.data;
+
+      data.forEach(loc => {
+        if (!loc.latitude || !loc.longitude) return;
+        const marker = L.marker([+loc.latitude, +loc.longitude]).addTo(map);
+        marker.bindPopup(`<b>${loc.name}</b><br>${loc.description || ''}`);
+        marker.category = loc.category?.toLowerCase() || '';
+        marker.name = loc.name?.toLowerCase() || '';
+        marker._original = marker.getLatLng(); // For future reference
+      });
+
+      setupFiltering(data);
+    }
+
+    // Setup filtering
+    function setupFiltering(data) {
+      const filters = document.querySelectorAll('.filter');
+      const searchBox = document.getElementById('searchBox');
+      const clearBtn = document.getElementById('clearFilters');
+
+      function updateMarkers() {
+        const activeFilters = [...filters].filter(f => f.checked).map(f => f.value.toLowerCase());
+        const searchTerm = searchBox.value.trim().toLowerCase();
+
+        map.eachLayer(layer => {
+          if (layer instanceof L.Marker) {
+            const matchesFilter = !activeFilters.length || activeFilters.some(f => layer.category.includes(f));
+            const matchesSearch = !searchTerm || layer.name.includes(searchTerm);
+            if (matchesFilter && matchesSearch) {
+              layer.addTo(map);
+            } else {
+              map.removeLayer(layer);
+            }
+          }
+        });
+      }
+
+      filters.forEach(f => f.addEventListener('change', updateMarkers));
+      searchBox.addEventListener('input', updateMarkers);
+      clearBtn.addEventListener('click', () => {
+        filters.forEach(f => f.checked = false);
+        searchBox.value = '';
+        updateMarkers();
+      });
+    }
+
+    loadData();
   </script>
 </body>
 </html>
